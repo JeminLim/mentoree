@@ -15,28 +15,29 @@ import static javax.persistence.FetchType.*;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Table(name = "Categories")
 public class Category extends BaseTimeEntity{
 
     @Id @GeneratedValue
     @Column(name = "category_id")
     private Long id;
 
-    private String name;
+    private String categoryName;
 
     @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "parent_id")
-    private Category parent;
+    private Category parentCategory;
 
-    @OneToMany(mappedBy = "parent")
-    private List<Category> child = new ArrayList<>();
+    @OneToMany(mappedBy = "parentCategory")
+    private List<Category> childCategory = new ArrayList<>();
 
     @Builder
-    public Category(String name, Category parent, List<Category> child) {
-        Assert.notNull(name, "category name must not be null");
+    public Category(String categoryName, Category parentCategory, List<Category> childCategory) {
+        Assert.notNull(categoryName, "category name must not be null");
 
-        this.name = name;
-        this.parent = parent;
-        this.child = child;
+        this.categoryName = categoryName;
+        this.parentCategory = parentCategory;
+        this.childCategory = childCategory;
     }
 
 

@@ -20,19 +20,19 @@ public class Program extends BaseTimeEntity{
     @Column(name = "program_id")
     private Long id;
 
-    private String name;
+    private String programName;
     private String description;
 
     private int maxMember;
 
     private LocalDateTime endDate;
 
-    public Program(String name, String description, int maxMember) {
-        Assert.notNull(name, "program name must not be null");
+    public Program(String programName, String description, int maxMember) {
+        Assert.notNull(programName, "program name must not be null");
         Assert.notNull(description, "description name must not be null");
         Assert.isTrue(maxMember > 0, "member limit must be greater than 0");
 
-        this.name = name;
+        this.programName = programName;
         this.description = description;
         this.maxMember = maxMember;
     }

@@ -13,10 +13,10 @@ import static javax.persistence.FetchType.*;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class UserInterest extends BaseTimeEntity{
+public class MemberInterest extends BaseTimeEntity{
 
     @Id @GeneratedValue
-    @Column(name = "user_interest_id")
+    @Column(name = "member_interest_id")
     private Long id;
 
     @ManyToOne(fetch = LAZY)
@@ -24,16 +24,16 @@ public class UserInterest extends BaseTimeEntity{
     private Category category;
 
     @ManyToOne(fetch = LAZY)
-    @JoinColumn(name = "user_id")
-    private User user;
+    @JoinColumn(name = "member_id")
+    private Member member;
 
     @Builder
-    public UserInterest(Category category, User user) {
+    public MemberInterest(Category category, Member member) {
         Assert.notNull(category, "category must not be null");
-        Assert.notNull(user, "user must not be null");
+        Assert.notNull(member, "user must not be null");
 
         this.category = category;
-        this.user = user;
+        this.member = member;
 
     }
 

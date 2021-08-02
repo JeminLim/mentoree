@@ -22,8 +22,8 @@ public class Participant extends BaseTimeEntity {
     private Long id;
 
     @ManyToOne(fetch = LAZY)
-    @JoinColumn(name = "user_id")
-    private User user;
+    @JoinColumn(name = "member_id")
+    private Member member;
 
     @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "program_id")
@@ -36,13 +36,13 @@ public class Participant extends BaseTimeEntity {
     private LocalDateTime endDate;
 
     @Builder
-    public Participant(User user, Program program, ProgramRole role, boolean isHost) {
-        Assert.notNull(user, "participant user must not be null");
+    public Participant(Member member, Program program, ProgramRole role, boolean isHost) {
+        Assert.notNull(member, "participant user must not be null");
         Assert.notNull(program, "participant program must not be null");
         Assert.notNull(role, "participant role must not be null");
         Assert.notNull(isHost, "isHost variable must not be null");
 
-        this.user = user;
+        this.member = member;
         this.program = program;
         this.role = role;
         this.isHost = isHost;

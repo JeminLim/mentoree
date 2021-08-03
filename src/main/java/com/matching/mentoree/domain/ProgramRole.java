@@ -1,5 +1,7 @@
 package com.matching.mentoree.domain;
 
+import lombok.Getter;
+
 public enum ProgramRole {
 
     MENTOR("멘토"),

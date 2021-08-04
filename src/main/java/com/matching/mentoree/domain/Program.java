@@ -23,7 +23,10 @@ public class Program extends BaseTimeEntity{
     private String description;
     private String goal;
 
+    private int curNum;
     private int maxMember;
+
+    private boolean isOpen;
 
     private LocalDateTime endDate;
 
@@ -38,6 +41,17 @@ public class Program extends BaseTimeEntity{
         this.description = description;
         this.maxMember = maxMember;
         this.goal = goal;
+        this.isOpen = true;
+        this.curNum = 1;
+    }
+
+    //== 비지니스 로직 ==//
+    /**
+     * 멤버 충원 (목표 인원 충원 시 모집 종료 )
+     */
+    public void addParticipant() {
+        this.curNum += 1;
+        isOpen = curNum < maxMember ? true : false;
     }
 
 }

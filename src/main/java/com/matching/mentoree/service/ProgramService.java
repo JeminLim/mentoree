@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.persistence.EntityManager;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -26,7 +27,7 @@ public class ProgramService {
     private final EntityManager em;
 
     @Transactional
-    public void CreateProgram(ProgramCreateDTO createDTO, Long loginMemberId) {
+    public void createProgram(ProgramCreateDTO createDTO, Long loginMemberId) {
 
         Program program = programRepository.save(createDTO.toProgramEntity());
 
@@ -49,9 +50,12 @@ public class ProgramService {
                                     .member(findMember)
                                     .isHost(true)
                                     .role(ProgramRole.valueOf(createDTO.getProgramRole()))
+                                    .approval(true)
                                     .build();
         participantRepository.save(participant);
     }
+
+
 
 
 }

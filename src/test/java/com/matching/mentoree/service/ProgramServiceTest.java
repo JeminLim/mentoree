@@ -79,7 +79,7 @@ class ProgramServiceTest {
                         .build());
 
         //when
-        programService.CreateProgram(programCreateDTO, 1L);
+        programService.createProgram(programCreateDTO, 1L);
 
         //then
         verify(programRepository).save(argThat(program -> program.getProgramName().equals("test program")));

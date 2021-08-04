@@ -1,5 +1,6 @@
 package com.matching.mentoree.domain;
 
+import com.matching.mentoree.exception.ClosedProgramException;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -33,10 +34,13 @@ public class Participant extends BaseTimeEntity {
     private ProgramRole role;
 
     private boolean isHost;
+
+    private boolean approval;
+
     private LocalDateTime endDate;
 
     @Builder
-    public Participant(Member member, Program program, ProgramRole role, boolean isHost) {
+    public Participant(Member member, Program program, ProgramRole role, boolean isHost, boolean approval) {
         Assert.notNull(member, "participant user must not be null");
         Assert.notNull(program, "participant program must not be null");
         Assert.notNull(role, "participant role must not be null");
@@ -46,5 +50,23 @@ public class Participant extends BaseTimeEntity {
         this.program = program;
         this.role = role;
         this.isHost = isHost;
+        this.approval = approval;
     }
+
+    //== 비지니스 로직 ==//
+
+    /**
+     * 프로그램 참가 승인
+     */
+    public void approve() {
+        if(program.isOpen()) {
+            approval = true;
+            program.addParticipant();
+        } else {
+            throw new ClosedProgramException("Program had been closed");
+        }
+    }
+
+
+
 }

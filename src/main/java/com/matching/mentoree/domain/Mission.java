@@ -7,11 +7,10 @@ import lombok.NoArgsConstructor;
 import org.apache.tomcat.jni.Local;
 import org.springframework.util.Assert;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
+import javax.persistence.*;
 import java.time.LocalDateTime;
+
+import static javax.persistence.FetchType.*;
 
 @Entity
 @Getter
@@ -22,14 +21,23 @@ public class Mission extends BaseTimeEntity {
     @Column(name = "mission_id")
     private Long id;
 
+    @ManyToOne(fetch = LAZY)
+    @JoinColumn(name = "program_id")
+    private Program program;
+
+    private String title;
     private String content;
     private LocalDateTime dueDate;
 
     @Builder
-    public Mission(String content, LocalDateTime dueDate) {
+    public Mission(Program program, String title, String content, LocalDateTime dueDate) {
+        Assert.notNull(program, "program must not be null");
+        Assert.notNull(title, "title must not be null");
         Assert.notNull(content, "content must not be null");
         Assert.notNull(dueDate, "dueDate must not be null");
 
+        this.program = program;
+        this.title = title;
         this.content = content;
         this.dueDate = dueDate;
     }

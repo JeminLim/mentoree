@@ -1,9 +1,6 @@
 package com.matching.mentoree.domain;
 
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.springframework.util.Assert;
 
 import javax.persistence.*;
@@ -13,6 +10,7 @@ import static javax.persistence.FetchType.*;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@EqualsAndHashCode
 public class MenteeBoard extends BaseTimeEntity {
 
     @Id @GeneratedValue
@@ -38,8 +36,10 @@ public class MenteeBoard extends BaseTimeEntity {
         this.mission = mission;
         this.content = content;
         this.writer = writer;
-
     }
+
+    //== 변경 로직 ==//
+    public void updateContent(String content) { this.content = content; }
 
 
 }

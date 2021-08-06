@@ -14,32 +14,35 @@ import lombok.Setter;
 @NoArgsConstructor
 public class BoardDTO {
 
+    private Long missionId;
+    private Long memberId;
+    private Long menteeBoardId;
     private String content;
-    private Mission mission;
-    private MenteeBoard menteeBoard;
 
     @Builder
-    public BoardDTO(String content, Mission mission, MenteeBoard menteeBoard) {
+    public BoardDTO(Long missionId, Long memberId, Long menteeBoardId, String content) {
+        this.missionId = missionId;
+        this.memberId = memberId;
+        this.menteeBoardId = menteeBoardId;
         this.content = content;
-        this.mission = mission;
-        this.menteeBoard = menteeBoard;
     }
 
-    public MenteeBoard toMenteeBoardEntity(Member writer) {
+    public MenteeBoard toMenteeBoardEntity(Mission mission, Member writer) {
         return MenteeBoard.builder()
-                .content(content)
                 .mission(mission)
                 .writer(writer)
+                .content(content)
                 .build();
     }
 
-    public MentorBoard toMentorBoardEntity(Member writer) {
+    public MentorBoard toMentorBoardEntity(MenteeBoard menteeBoard, Member writer) {
         return MentorBoard.builder()
                 .menteeBoard(menteeBoard)
-                .feedback(content)
                 .writer(writer)
+                .feedback(content)
                 .build();
     }
+
 
 
 }

@@ -8,18 +8,20 @@ import java.util.List;
 @Getter
 @Setter
 @NoArgsConstructor
-public class ProgramCreateDTO {
+public class ProgramDTO {
 
     private String programName;
-    private Member host;
     private int targetNumber;
     private String goal;
     private String description;
-    private String programRole;
     private List<String> categories;
 
+
+    private Member host;
+    private String programRole;
+
     @Builder
-    public ProgramCreateDTO(String programName, Member host, int targetNumber, String goal, String description, String programRole, List<String> categories) {
+    public ProgramDTO(String programName, Member host, int targetNumber, String goal, String description, String programRole, List<String> categories) {
         this.programName = programName;
         this.host = host;
         this.targetNumber = targetNumber;
@@ -29,7 +31,7 @@ public class ProgramCreateDTO {
         this.categories = categories;
     }
 
-    public Program toProgramEntity() {
+    public Program toEntity() {
         return Program.builder()
                 .programName(programName)
                 .description(description)

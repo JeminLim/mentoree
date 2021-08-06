@@ -12,23 +12,24 @@ import java.time.LocalDateTime;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@ToString(of = {"id", "programName", "description", "goal", "maxMember"})
+@EqualsAndHashCode
 public class Program extends BaseTimeEntity{
 
     @Id @GeneratedValue
     @Column(name = "program_id")
     private Long id;
 
+    //변경 가능
     private String programName;
     private String description;
     private String goal;
+    private int maxMember;
+    //========================//
 
     private int curNum;
-    private int maxMember;
-
     private boolean isOpen;
-
     private LocalDateTime endDate;
+
 
     @Builder
     public Program(String programName, String description, int maxMember, String goal) {
@@ -44,6 +45,12 @@ public class Program extends BaseTimeEntity{
         this.isOpen = true;
         this.curNum = 1;
     }
+
+    //== 변경 로직 ==//
+    public void updateName(String programName) { this.programName = programName; }
+    public void updateDescription(String description) { this.description = description; }
+    public void updateGoal(String description) { this.description = description; }
+    public void updateMaxMember(int maxMember) { this.maxMember = maxMember; }
 
     //== 비지니스 로직 ==//
     /**

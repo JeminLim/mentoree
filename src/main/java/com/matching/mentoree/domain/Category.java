@@ -1,10 +1,7 @@
 package com.matching.mentoree.domain;
 
 import com.mysema.commons.lang.Assert;
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -16,6 +13,7 @@ import static javax.persistence.FetchType.*;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "Categories")
+@EqualsAndHashCode
 public class Category extends BaseTimeEntity{
 
     @Id @GeneratedValue

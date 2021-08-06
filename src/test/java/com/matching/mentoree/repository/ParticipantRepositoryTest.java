@@ -31,7 +31,7 @@ class ParticipantRepositoryTest {
     @Test
     public void find_participants_by_member_test() throws Exception {
         //given
-        Member member = Member.builder().username("tester").email("test@email.com").password("1234").build();
+        Member member = Member.builder().username("tester").email("test@email.com").userPassword("1234").nickname("testNick").build();
         em.persist(member);
         Program program = Program.builder().programName("test").maxMember(2).description("test desc").goal("test goal").build();
         em.persist(program);
@@ -65,9 +65,9 @@ class ParticipantRepositoryTest {
         Program program = Program.builder().programName("test").maxMember(2).description("test desc").goal("test goal").build();
         em.persist(program);
 
-        Member member = Member.builder().username("tester").email("test@email.com").password("1234").build();
+        Member member = Member.builder().username("tester").email("test@email.com").userPassword("1234").nickname("testNick").build();
         em.persist(member);
-        Member member2 = Member.builder().username("tester2").email("test2@email.com").password("12345").build();
+        Member member2 = Member.builder().username("tester2").email("test2@email.com").userPassword("12345").nickname("testNick2").build();
         em.persist(member);
 
         Participant testParticipant = Participant.builder()
@@ -92,6 +92,51 @@ class ParticipantRepositoryTest {
         List<Participant> listAll = participantRepository.findAll();
         //then
         assertThat(listAll.size()).isEqualTo(1);
+    }
+
+    @Test
+    public void find_participant_history_test() throws Exception {
+        //given
+        Program program = Program.builder().programName("test").maxMember(2).description("test desc").goal("test goal").build();
+        Program program2 = Program.builder().programName("test").maxMember(2).description("test desc").goal("test goal").build();
+        Program program3 = Program.builder().programName("test").maxMember(2).description("test desc").goal("test goal").build();
+        em.persist(program);
+        em.persist(program2);
+        em.persist(program3);
+
+        Member member = Member.builder().username("tester").email("test@email.com").userPassword("1234").nickname("testNick").build();
+        em.persist(member);
+
+        Participant testParticipant = Participant.builder()
+                .program(program)
+                .member(member)
+                .isHost(false)
+                .role(ProgramRole.MENTEE)
+                .approval(false)
+                .build();
+        Participant testParticipant2 = Participant.builder()
+                .program(program2)
+                .member(member)
+                .isHost(false)
+                .role(ProgramRole.MENTEE)
+                .approval(false)
+                .build();
+        Participant testParticipant3 = Participant.builder()
+                .program(program3)
+                .member(member)
+                .isHost(false)
+                .role(ProgramRole.MENTEE)
+                .approval(false)
+                .build();
+
+        participantRepository.save(testParticipant);
+        participantRepository.save(testParticipant2);
+        participantRepository.save(testParticipant3);
+        //when
+        List<Participant> findParticipants = participantRepository.findParticipateHistory(member);
+
+        //then
+        assertThat(findParticipants.size()).isEqualTo(3);
     }
 
 }

@@ -16,35 +16,40 @@ public class Member extends BaseTimeEntity{
     @Column(name = "member_id")
     private Long id;
 
+    //변경 불가능
     private String username;
     private String email;
+
+    //변경 가능
     private String userPassword;
+    private String nickname;
     private String originProfileImgUrl;
     private String thumbnailImgUrl;
     private String link;
 
     @Builder
-    public Member(String username, String email, String password, String originProfileImgUrl, String thumbnailImgUrl, String link) {
+    public Member(String username, String email, String nickname, String userPassword, String originProfileImgUrl, String thumbnailImgUrl, String link) {
         Assert.notNull(username, "username must not be null");
         Assert.notNull(email, "email must not be null");
-        Assert.notNull(password, "password must not be null");
+        Assert.notNull(userPassword, "userPassword must not be null");
+        Assert.notNull(nickname, "nickname must not be null");
 
         this.username = username;
         this.email = email;
-        this.userPassword = password;
+        this.nickname = nickname;
+        this.userPassword = userPassword;
         this.originProfileImgUrl = originProfileImgUrl;
         this.thumbnailImgUrl = thumbnailImgUrl;
         this.link = link;
     }
 
-    //== 비지니스 로직 ==//
-    public void updateProfile(String originProfileImgUrl, String thumbnailImgUrl) {
+    //== 변경 로직 ==//
+    public void updateProfileImg(String originProfileImgUrl, String thumbnailImgUrl) {
         this.originProfileImgUrl = originProfileImgUrl;
         this.thumbnailImgUrl = thumbnailImgUrl;
     }
-
     public void updateLink(String link) { this.link = link; }
-
+    public void updateNickname(String nickname) {this.nickname = nickname;}
     public void changePassword(String password) { this.userPassword = password;}
 
 

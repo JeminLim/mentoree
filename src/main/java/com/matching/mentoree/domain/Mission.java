@@ -1,9 +1,6 @@
 package com.matching.mentoree.domain;
 
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.apache.tomcat.jni.Local;
 import org.springframework.util.Assert;
 
@@ -15,6 +12,7 @@ import static javax.persistence.FetchType.*;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@EqualsAndHashCode
 public class Mission extends BaseTimeEntity {
 
     @Id @GeneratedValue
@@ -41,5 +39,10 @@ public class Mission extends BaseTimeEntity {
         this.content = content;
         this.dueDate = dueDate;
     }
+
+    //== 변경 로직 ==//
+    public void updateTitle(String title) { this.title = title; }
+    public void updateContent(String content) { this.content = content; }
+    public void updateDueDate(LocalDateTime dueDate) { this.dueDate = dueDate; }
 
 }

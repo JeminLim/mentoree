@@ -30,7 +30,8 @@ class MemberRepositoryTest {
         Member member = Member.builder()
                     .username("tester")
                     .email("abc@email.com")
-                    .password("1234")
+                    .userPassword("1234")
+                    .nickname("testNick")
                     .build();
         memberRepository.save(member);
 

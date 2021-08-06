@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDateTime;
 
@@ -14,21 +15,21 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public class MissionDTO {
 
-    private Program program;
+    private Long programId;
     private String title;
     private String content;
-    private int period;
+    @DateTimeFormat(pattern = "yyyy-mm-dd")
+    private LocalDateTime dueDate;
 
     @Builder
-    public MissionDTO(Program program, String title, String content, int period) {
-        this.program = program;
+    public MissionDTO(Long programId, String title, String content, LocalDateTime dueDate) {
+        this.programId = programId;
         this.title = title;
         this.content = content;
-        this.period = period;
+        this.dueDate = dueDate;
     }
 
-    public Mission toEntity() {
-        LocalDateTime dueDate = LocalDateTime.now().plusDays(period);
+    public Mission toEntity(Program program) {
         return Mission.builder()
                 .program(program)
                 .title(title)

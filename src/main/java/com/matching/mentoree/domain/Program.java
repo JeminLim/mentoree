@@ -49,7 +49,7 @@ public class Program extends BaseTimeEntity{
     //== 변경 로직 ==//
     public void updateName(String programName) { this.programName = programName; }
     public void updateDescription(String description) { this.description = description; }
-    public void updateGoal(String description) { this.description = description; }
+    public void updateGoal(String goal) { this.goal = goal; }
     public void updateMaxMember(int maxMember) { this.maxMember = maxMember; }
 
     //== 비지니스 로직 ==//

@@ -25,6 +25,9 @@ public class ProgramService {
     private final ParticipantRepository participantRepository;
     private final MemberRepository memberRepository;
 
+    /**
+     * 프로그램 생성
+     */
     @Transactional
     public void createProgram(ProgramDTO createDTO, Member login) {
 
@@ -53,29 +56,9 @@ public class ProgramService {
         participantRepository.save(participant);
     }
 
-    @Transactional
-    public void applyProgram(Member applyMember, String role, Long programId) {
-        Program targetProgram = programRepository.findById(programId).orElseThrow(NoSuchElementException::new);
-
-        participantRepository.save(Participant.builder()
-                .program(targetProgram)
-                .member(applyMember)
-                .role(ProgramRole.valueOf(role))
-                .isHost(false)
-                .approval(false)
-                .build());
-    }
-
-    @Transactional
-    public void approval(Long memberId, Long programId) {
-        getParticipant(memberId, programId).approve();
-    }
-
-    @Transactional
-    public void reject(Long memberId, Long programId) {
-        participantRepository.delete(getParticipant(memberId, programId));
-    }
-
+    /**
+     * 프로그램 수정
+     */
     @Transactional
     public void updateProgramInfo(ProgramDTO updateForm, Long programId) {
         Program program = programRepository.findById(programId).orElseThrow(NoSuchElementException::new);
@@ -93,6 +76,37 @@ public class ProgramService {
             program.updateGoal(updateForm.getGoal());
     }
 
+    /**
+     *  프로그램 참여 신청
+     */
+    @Transactional
+    public void applyProgram(Member applyMember, String role, Long programId) {
+        Program targetProgram = programRepository.findById(programId).orElseThrow(NoSuchElementException::new);
+
+        participantRepository.save(Participant.builder()
+                .program(targetProgram)
+                .member(applyMember)
+                .role(ProgramRole.valueOf(role))
+                .isHost(false)
+                .approval(false)
+                .build());
+    }
+
+    /**
+     * 프로그램 참여 승인
+     */
+    @Transactional
+    public void approval(Long memberId, Long programId) {
+        getParticipant(memberId, programId).approve();
+    }
+
+    /**
+     * 프로그램 참여 거부
+     */
+    @Transactional
+    public void reject(Long memberId, Long programId) {
+        participantRepository.delete(getParticipant(memberId, programId));
+    }
 
 
     private Participant getParticipant(Long memberId, Long programId) {
@@ -100,6 +114,5 @@ public class ProgramService {
         Program findProgram = programRepository.findById(programId).orElseThrow(NoSuchElementException::new);
         return participantRepository.findByMemberAndProgram(findMember, findProgram).orElseThrow(NoSuchElementException::new);
     }
-
 
 }

@@ -51,7 +51,7 @@ class MissionServiceTest {
                 .build();
 
         testMember = Member.builder()
-                .username("tester")
+                .memberName("tester")
                 .email("test@email.com")
                 .userPassword("1234")
                 .nickname("testNick")

@@ -31,7 +31,7 @@ class ParticipantRepositoryTest {
     @Test
     public void find_participants_by_member_test() throws Exception {
         //given
-        Member member = Member.builder().username("tester").email("test@email.com").userPassword("1234").nickname("testNick").build();
+        Member member = Member.builder().memberName("tester").email("test@email.com").userPassword("1234").nickname("testNick").build();
         em.persist(member);
         Program program = Program.builder().programName("test").maxMember(2).description("test desc").goal("test goal").build();
         em.persist(program);
@@ -65,9 +65,9 @@ class ParticipantRepositoryTest {
         Program program = Program.builder().programName("test").maxMember(2).description("test desc").goal("test goal").build();
         em.persist(program);
 
-        Member member = Member.builder().username("tester").email("test@email.com").userPassword("1234").nickname("testNick").build();
+        Member member = Member.builder().memberName("tester").email("test@email.com").userPassword("1234").nickname("testNick").build();
         em.persist(member);
-        Member member2 = Member.builder().username("tester2").email("test2@email.com").userPassword("12345").nickname("testNick2").build();
+        Member member2 = Member.builder().memberName("tester2").email("test2@email.com").userPassword("12345").nickname("testNick2").build();
         em.persist(member);
 
         Participant testParticipant = Participant.builder()
@@ -104,7 +104,7 @@ class ParticipantRepositoryTest {
         em.persist(program2);
         em.persist(program3);
 
-        Member member = Member.builder().username("tester").email("test@email.com").userPassword("1234").nickname("testNick").build();
+        Member member = Member.builder().memberName("tester").email("test@email.com").userPassword("1234").nickname("testNick").build();
         em.persist(member);
 
         Participant testParticipant = Participant.builder()

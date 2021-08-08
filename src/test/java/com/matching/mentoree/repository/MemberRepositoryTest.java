@@ -28,7 +28,7 @@ class MemberRepositoryTest {
     public void duplicate_email_check_success() throws Exception {
         //given
         Member member = Member.builder()
-                    .username("tester")
+                    .memberName("tester")
                     .email("abc@email.com")
                     .userPassword("1234")
                     .nickname("testNick")

@@ -57,7 +57,7 @@ class ProgramServiceTest {
                 .programRole("MENTOR")
                 .build();
 
-        member = Member.builder().username("tester").userPassword("1234").email("test@email.com").nickname("testNick").build();
+        member = Member.builder().memberName("tester").userPassword("1234").email("test@email.com").nickname("testNick").build();
     }
 
     @Test
@@ -80,7 +80,7 @@ class ProgramServiceTest {
                         .program(programDTO.toEntity())
                         .category(Category.builder().categoryName("test").build()));
 
-        given(memberRepository.findById(any())).willReturn(Optional.of(Member.builder().username("tester").userPassword("1234").email("test@email.com").build()));
+        given(memberRepository.findById(any())).willReturn(Optional.of(Member.builder().memberName("tester").userPassword("1234").email("test@email.com").build()));
 
         given(participantRepository.save(argThat(participant -> participant.isHost() == true)))
                 .willReturn(Participant.builder()

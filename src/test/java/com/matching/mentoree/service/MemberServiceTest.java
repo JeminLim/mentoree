@@ -5,7 +5,6 @@ import com.matching.mentoree.repository.MemberRepository;
 import com.matching.mentoree.repository.ParticipantRepository;
 import com.matching.mentoree.service.dto.MemberCreateDTO;
 import com.matching.mentoree.service.dto.MemberInfoDTO;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -15,8 +14,6 @@ import org.mockito.Mock;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import static org.assertj.core.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.times;
@@ -37,7 +34,7 @@ class MemberServiceTest {
     @BeforeEach
     public void setUp() {
         login = Member.builder()
-                .username("tester")
+                .memberName("tester")
                 .email("test@email.com")
                 .userPassword("1234")
                 .nickname("testNick")
@@ -49,7 +46,7 @@ class MemberServiceTest {
     public void create_user_test() throws Exception {
         //given
         MemberCreateDTO createDTO = MemberCreateDTO.builder()
-                .username("tester")
+                .memberName("tester")
                 .userPassword("1234")
                 .email("test@email.com")
                 .nickname("testNick")

@@ -52,7 +52,7 @@ class BoardServiceTest {
 
         member = Member.builder()
                 .nickname("testNick")
-                .username("testName")
+                .memberName("testName")
                 .userPassword("1234")
                 .email("test@email.com")
                 .build();

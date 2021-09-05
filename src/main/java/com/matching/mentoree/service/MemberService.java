@@ -2,18 +2,15 @@ package com.matching.mentoree.service;
 
 import com.matching.mentoree.domain.Member;
 import com.matching.mentoree.domain.Participant;
-import com.matching.mentoree.domain.Program;
+import com.matching.mentoree.domain.UserRole;
 import com.matching.mentoree.repository.MemberRepository;
 import com.matching.mentoree.repository.ParticipantRepository;
-import com.matching.mentoree.repository.ProgramRepository;
-import com.matching.mentoree.service.dto.MemberCreateDTO;
-import com.matching.mentoree.service.dto.MemberInfoDTO;
+import com.matching.mentoree.service.dto.MemberDTO;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
 @Service
@@ -22,11 +19,12 @@ public class MemberService {
 
     private final MemberRepository memberRepository;
     private final ParticipantRepository participantRepository;
+    private final PasswordEncoder passwordEncoder;
 
     //== 회원가입 ==//
     @Transactional
-    public void join(MemberCreateDTO createForm) {
-        memberRepository.save(createForm.toEntity());
+    public void join(MemberDTO.RegistrationRequest request) {
+        memberRepository.save(request.toEntity(passwordEncoder, UserRole.USER));
     }
 
     @Transactional
@@ -36,7 +34,7 @@ public class MemberService {
 
     //== 회원 정보 변경 ==//
     @Transactional
-    public void updateMemberInfo(MemberInfoDTO memberInfoDTO, Member login){
+    public void updateMemberInfo(MemberDTO.MemberInfo memberInfoDTO, Member login){
         if(memberInfoDTO.getNickname() != null && !memberInfoDTO.getNickname().equals(login.getNickname()))
             login.updateNickname(memberInfoDTO.getNickname());
 
@@ -54,9 +52,8 @@ public class MemberService {
 
     //== 회원 정보 열람 ==//
     @Transactional
-    public MemberInfoDTO getPersonalInfo(Member login) {
-        return MemberInfoDTO.builder()
-                .username(login.getUsername())
+    public MemberDTO.MemberInfo getPersonalInfo(Member login) {
+        return MemberDTO.MemberInfo.builder()
                 .email(login.getEmail())
                 .nickname(login.getNickname())
                 .originProfileImgUrl(login.getOriginProfileImgUrl())

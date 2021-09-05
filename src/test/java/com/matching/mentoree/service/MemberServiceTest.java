@@ -1,16 +1,17 @@
 package com.matching.mentoree.service;
 
 import com.matching.mentoree.domain.Member;
+import com.matching.mentoree.domain.UserRole;
 import com.matching.mentoree.repository.MemberRepository;
 import com.matching.mentoree.repository.ParticipantRepository;
-import com.matching.mentoree.service.dto.MemberCreateDTO;
-import com.matching.mentoree.service.dto.MemberInfoDTO;
+import com.matching.mentoree.service.dto.MemberDTO;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import static org.assertj.core.api.Assertions.*;
@@ -26,6 +27,8 @@ class MemberServiceTest {
     private MemberRepository memberRepository;
     @Mock
     private ParticipantRepository participantRepository;
+    @Mock
+    private PasswordEncoder passwordEncoder;
     @InjectMocks
     private MemberService memberService;
 
@@ -45,15 +48,15 @@ class MemberServiceTest {
     @DisplayName("유저 회원가입 테스트")
     public void create_user_test() throws Exception {
         //given
-        MemberCreateDTO createDTO = MemberCreateDTO.builder()
+        MemberDTO.RegistrationRequest createDTO = MemberDTO.RegistrationRequest.builder()
                 .memberName("tester")
-                .userPassword("1234")
+                .password("1234")
                 .email("test@email.com")
                 .nickname("testNick")
                 .build();
 
         given(memberRepository.save(argThat(member -> member.getEmail().equals("test@email.com"))))
-                .willReturn(createDTO.toEntity());
+                .willReturn(createDTO.toEntity(passwordEncoder, UserRole.USER));
         //when
         memberService.join(createDTO);
         //then
@@ -64,7 +67,7 @@ class MemberServiceTest {
     @DisplayName("회원 정보 변경 테스트")
     public void update_member_info() throws Exception {
         //given
-        MemberInfoDTO dto = MemberInfoDTO.builder()
+        MemberDTO.MemberInfo dto = MemberDTO.MemberInfo.builder()
                 .nickname("changedNick")
                 .link("changedLink")
                 .originProfileImgUrl("changedUrl")
@@ -87,7 +90,7 @@ class MemberServiceTest {
         //given
         login.updateLink("originLink");
 
-        MemberInfoDTO dto = MemberInfoDTO.builder()
+        MemberDTO.MemberInfo dto = MemberDTO.MemberInfo.builder()
                 .originProfileImgUrl("changedUrl")
                 .thumbnailImgUrl("changedThumbUrl")
                 .build();

@@ -24,13 +24,21 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	implementation 'org.springframework.boot:spring-boot-devtools'
-
 	implementation 'com.querydsl:querydsl-jpa'
 	implementation "org.springframework.boot:spring-boot-starter-security"
-	implementation 'io.jsonwebtoken:jjwt:0.9.1' // JWT를 위한 JWT 토큰 관리 라이브러리
 	implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
+	implementation group: 'org.json', name: 'json', version: '20210307'
+
+
+	//== JWT 관련 ==//
+	implementation 'io.jsonwebtoken:jjwt-api:0.11.2'
+	runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.2'
+	runtimeOnly('io.jsonwebtoken:jjwt-orgjson:0.11.2') {
+		exclude group: 'org.json', module: 'json' //provided by Android natively
+	}
 
 	compileOnly 'org.projectlombok:lombok'
+
 
 	runtimeOnly 'com.h2database:h2'
 	runtimeOnly 'org.mariadb.jdbc:mariadb-java-client'

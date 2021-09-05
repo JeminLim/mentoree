@@ -54,7 +54,7 @@ class ParticipantRepositoryTest {
 
         //then
         assertThat(findParticipant.getMember()).isEqualTo(member);
-        assertThat(findParticipant.getMember().getUsername()).isEqualTo(member.getUsername());
+        assertThat(findParticipant.getMember().getEmail()).isEqualTo(member.getEmail());
         assertThat(findParticipant.getMember().getEmail()).isEqualTo(member.getEmail());
 
     }

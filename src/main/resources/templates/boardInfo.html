@@ -51,65 +51,53 @@
             <div id="layoutSidenav_content">
                 <main>
                     <div class="container-fluid px-4">
-                        <h1 class="mt-4">수행 보드</h1>
+                        <h1 class="mt-4">진행중인 미션 이름</h1>
                         <ol class="breadcrumb mb-4">
-                            <li class="breadcrumb-item active">현재 미션</li>
+                            <li class="breadcrumb-item active">작성자 아이디</li>
                         </ol>
                         <div class="row">
-                            <div class="col-xl-4 col-md-6">
+                            <div class="col-xl-12 col-md-12">
                                 <div class="card bg-white text-dark mb-4">
                                     <div class="card-header">
                                         <i class="fas fa-clone me-1"></i>
-                                        미션 제목
+                                        수행 내용
                                     </div>
                                     <div class="card-body">
-                                        <table class="w-100">
-                                            <tbody>
-                                            <tr>
-                                                <td width="20%">제목</td>
-                                                <td width="60%">나는 프로그래머다</td>
-                                                <td width="20%">IT</td>
-                                            </tr>
-                                            <tr>
-                                                <td style="font:bold;" width="20%" colspan="1">멘토</td>
-                                                <td width="80%" colspan="2">우리의 멘토</td>
-                                            </tr>
-                                            <tr>
-                                                <td style="font:bold;" width="20%" colspan="1">목표</td>
-                                                <td width="80%" colspan="2">웹 프로그래밍 이해와 실습을 통한 숙련도 높이기</td>
-                                            </tr>
-                                            </tbody>
-                                        </table>
+                                        <span>수행 했던 내용을 표기</span>
                                     </div>
                                 </div>
                             </div>
-                            <ol class="breadcrumb mb-4">
-                                <li class="breadcrumb-item active">수행 내용</li>
-                            </ol>
+                        </div>
+                        <div class="card">
                             <div class="row">
-                                <div class="col-xl-12">
-                                    <div class="card mb-4">
-                                        <div class="card-header d-flex">
-                                            <div class="col-md-10"><i class="fas fa-clone"></i> 해당 미션 이름</div>
-                                            <div class="col-md-2">작성자 : 누구누구</div>
-                                        </div>
-                                        <div class="card-body">
-                                            미션 수행 내용의 마크다운 형식 게시판
-                                        </div>
-                                    </div>
+                                <div id="comment-row" class="col-md-12">
+                                    <label class="mx-3 mt-3">댓글 작성</label>
+                                    <textarea style="width: 95%; overflow: scroll;" class="w-80 mx-3 mt-3" id="new-comment" name="feedback" placeholder="내용을 입력해주세요"></textarea>
+                                </div>
+                                <div class="col-md-2">
+                                    <button class="btn btn-primary mx-3 my-2" type="submit" onclick="">작성하기</button>
                                 </div>
                             </div>
-                            <div class="row">
-                                <div class="col-xl-12">
-                                    <div class="card mb-4">
-                                        <div class="card-header d-flex">
-                                            <div class="col-md-10"><i class="fas fa-clone"></i> 해당 미션 이름</div>
-                                            <div class="col-md-2">작성자 : 누구누구</div>
-                                        </div>
-                                        <div class="card-body">
-                                            미션 수행 내용의 마크다운 형식 게시판
-                                        </div>
-                                    </div>
+                        </div>
+                        <div class="card my-3">
+                            <span class="mx-3 mt-2" style="font-size: 0.8em; color: #c1c1c1">2020-20-20 00:00:00</span>
+                            <div class="row mb-2">
+                                <div class="col-md-1">
+                                    <span class="mx-3">작성자</span>
+                                </div>
+                                <div class="col-md-11">
+                                    <span class="mx-3"> 피드백 내용</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card my-3">
+                            <span class="mx-3 mt-2" style="font-size: 0.8em; color: #c1c1c1">2020-20-20 00:00:00</span>
+                            <div class="row mb-2">
+                                <div class="col-md-1">
+                                    <span class="mx-3">작성자</span>
+                                </div>
+                                <div class="col-md-11">
+                                    <span class="mx-3"> 피드백 내용</span>
                                 </div>
                             </div>
                         </div>

@@ -70,8 +70,7 @@ class MemberServiceTest {
         MemberDTO.MemberInfo dto = MemberDTO.MemberInfo.builder()
                 .nickname("changedNick")
                 .link("changedLink")
-                .originProfileImgUrl("changedUrl")
-                .thumbnailImgUrl("changedThumbUrl")
+                .imgUrl("changedUrl")
                 .build();
 
         //when
@@ -80,8 +79,7 @@ class MemberServiceTest {
         //then
         assertThat(login.getNickname()).isEqualTo(dto.getNickname());
         assertThat(login.getLink()).isEqualTo(dto.getLink());
-        assertThat(login.getOriginProfileImgUrl()).isEqualTo(dto.getOriginProfileImgUrl());
-        assertThat(login.getThumbnailImgUrl()).isEqualTo(dto.getThumbnailImgUrl());
+        assertThat(login.getOriginProfileImgUrl()).isEqualTo(dto.getImgUrl());
     }
 
     @Test
@@ -91,8 +89,7 @@ class MemberServiceTest {
         login.updateLink("originLink");
 
         MemberDTO.MemberInfo dto = MemberDTO.MemberInfo.builder()
-                .originProfileImgUrl("changedUrl")
-                .thumbnailImgUrl("changedThumbUrl")
+                .imgUrl("changedUrl")
                 .build();
 
         //when

@@ -35,10 +35,12 @@ public class Participant extends BaseTimeEntity {
 
     private boolean approval;
 
+    private String message;
+
     private LocalDateTime endDate;
 
     @Builder
-    public Participant(Member member, Program program, ProgramRole role, boolean isHost, boolean approval) {
+    public Participant(Member member, Program program, ProgramRole role, boolean isHost, boolean approval, String message) {
         Assert.notNull(member, "participant user must not be null");
         Assert.notNull(program, "participant program must not be null");
         Assert.notNull(role, "participant role must not be null");
@@ -49,6 +51,7 @@ public class Participant extends BaseTimeEntity {
         this.role = role;
         this.isHost = isHost;
         this.approval = approval;
+        this.message = message;
     }
 
     //== 비지니스 로직 ==//

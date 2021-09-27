@@ -41,8 +41,8 @@ public class MemberService {
         if(memberInfoDTO.getLink() != null && !memberInfoDTO.getLink().equals(login.getLink()))
             login.updateLink(memberInfoDTO.getLink());
 
-        if(memberInfoDTO.getOriginProfileImgUrl() != null && !memberInfoDTO.getOriginProfileImgUrl().equals(login.getOriginProfileImgUrl()))
-            login.updateProfileImg(memberInfoDTO.getOriginProfileImgUrl(), memberInfoDTO.getThumbnailImgUrl());
+        if(memberInfoDTO.getImgUrl() != null && !memberInfoDTO.getImgUrl().equals(login.getOriginProfileImgUrl()))
+            ;
     }
 
     @Transactional
@@ -56,8 +56,7 @@ public class MemberService {
         return MemberDTO.MemberInfo.builder()
                 .email(login.getEmail())
                 .nickname(login.getNickname())
-                .originProfileImgUrl(login.getOriginProfileImgUrl())
-                .thumbnailImgUrl(login.getThumbnailImgUrl())
+                .imgUrl(login.getThumbnailImgUrl())
                 .link(login.getLink())
                 .programList(participantRepository.findParticipateHistory(login).stream()
                                     .map(Participant::getProgram)

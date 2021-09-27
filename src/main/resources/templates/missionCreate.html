@@ -2,51 +2,10 @@
 <html xmlns:th="http://www.thymeleaf.org">
     <head th:replace="fragments/header :: header" />
     <body class="sb-nav-fixed">
-        <nav class="sb-topnav navbar navbar-expand navbar-dark bg-dark">
-            <!-- Navbar Brand-->
-            <a class="navbar-brand ps-3" href="index.html">MENTOREE</a>
-            <!-- Sidebar Toggle-->
-            <button class="btn btn-link btn-sm order-1 order-lg-0 me-4 me-lg-0" id="sidebarToggle" href="#!"><i class="fas fa-bars"></i></button>
-            <div class="d-none d-md-inline-block form-inline ms-auto me-0 me-md-3 my-2 my-md-0"></div>
-            <!-- Navbar-->
-            <ul class="navbar-nav ms-auto ms-md-0 me-3 me-lg-4">
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" id="navbarDropdown" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false"><i class="fas fa-user fa-fw"></i></a>
-                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
-                        <li><a class="dropdown-item" href="#!">프로필</a></li>
-                        <li><a class="dropdown-item" href="#!">내 프로그램</a></li>
-                        <li><hr class="dropdown-divider" /></li>
-                        <li><a class="dropdown-item" href="#!">로그아웃</a></li>
-                    </ul>
-                </li>
-            </ul>
-        </nav>
+        <nav th:replace="fragments/nav :: nav" />
         <div id="layoutSidenav">
             <div id="layoutSidenav_nav">
-                <nav class="sb-sidenav accordion sb-sidenav-dark" id="sidenavAccordion">
-                    <div class="sb-sidenav-menu">
-                        <div class="nav">
-                            <div class="sb-sidenav-menu-heading">MATCH</div>
-                            <a class="nav-link" href="index.html">
-                                <div class="sb-nav-link-icon"><i class="fas fa-search"></i></div>
-                                프로그램 찾기
-                            </a>
-                            <div class="sb-sidenav-menu-heading">MY MENU</div>
-                            <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapseLayouts" aria-expanded="false" aria-controls="collapseLayouts">
-                                <div class="sb-nav-link-icon"><i class="fas fa-columns"></i></div>
-                                내 프로그램
-                                <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
-                            </a>
-                            <div class="collapse" id="collapseLayouts" aria-labelledby="headingOne" data-bs-parent="#sidenavAccordion">
-                                <nav class="sb-sidenav-menu-nested nav">
-                                    <a class="nav-link" href="layout-static.html">프로그램 소개</a>
-                                    <a class="nav-link" href="layout-sidenav-light.html">미션</a>
-                                    <a class="nav-link" href="layout-sidenav-light.html">수행보드</a>
-                                </nav>
-                            </div>                            
-                        </div>
-                    </div>
-                </nav>
+                <nav th:replace="fragments/sidenav :: sidenav" />
             </div>
             <div id="layoutSidenav_content">
                 <main>
@@ -60,11 +19,11 @@
                                         미션 작성
                                     </div>
                                     <div class="card-body">
-                                        <form>
+                                        <form th:action="@{/mission/write}" th:object="${missionForm}" method="post">
                                             <div class="row mb-3">
                                                 <div class="col-md-12">
                                                     <div class="form-floating mb-3 mb-md-0">
-                                                        <input class="form-control" id="inputProgramTitle" type="text" placeholder="미션 타이틀" />
+                                                        <input class="form-control" name="title" id="inputProgramTitle" type="text" placeholder="미션 타이틀" name=""/>
                                                         <label for="inputProgramTitle">미션 타이틀</label>
                                                     </div>
                                                 </div>
@@ -72,14 +31,14 @@
                                             <div class="row mb-3">
                                                 <div class="col-md-10">
                                                     <div class="form-floating mb-3">
-                                                        <input class="form-control" id="inputGoal" type="text" placeholder="미션 목표" />
+                                                        <input class="form-control" name="goal" id="inputGoal" type="text" placeholder="미션 목표" />
                                                         <label for="inputGoal">미션 목표</label>
                                                     </div>
                                                 </div>
                                                 <div class="col-md-2">
                                                     <div class="form-floating mb-3 mb-md-0">
-                                                        <label for="intputDueDate"> 기한 </label>
-                                                        <input style="padding-left:40%"class="form-control pb-4" id="inputDueDate" type="date" />
+                                                        <label> 기한 </label>
+                                                        <input style="padding-left:40%" name="dueDate" class="form-control pb-4" id="inputDueDate" type="date" />
                                                     </div>
                                                 </div>
                                             </div>
@@ -87,12 +46,13 @@
                                                 <div class="col-md-12">
                                                     <label class="mb-3" for="inputDesc">미션 설명</label>
                                                     <div class="form-floating mb-3">
-                                                        <textarea style="width: 100%; height: 500px; overflow:scroll;" class="form-control" id="inputDesc" type="textarea" placeholder="프로그램 설명"></textarea>
+                                                        <textarea style="width: 100%; height: 500px; overflow:scroll;" name="content" class="form-control" id="inputDesc" type="textarea" placeholder="프로그램 설명"></textarea>
                                                     </div>
                                                 </div>
                                             </div>
                                             <div class="mt-4 mb-0 float-right">
-                                                <button class="btn btn-primary btn-block pull-right" href="login.html">작성하기</button>
+                                                <input type="hidden" th:value = "${missionForm.programId}"/>
+                                                <button type="submit" class="btn btn-primary btn-block pull-right">작성하기</button>
                                             </div>
                                         </form>
                                     </div>

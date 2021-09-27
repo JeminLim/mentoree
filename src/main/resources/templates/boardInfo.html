@@ -2,58 +2,17 @@
 <html xmlns:th="http://www.thymeleaf.org">
     <head th:replace="fragments/header :: header" />
     <body class="sb-nav-fixed">
-        <nav class="sb-topnav navbar navbar-expand navbar-dark bg-dark">
-            <!-- Navbar Brand-->
-            <a class="navbar-brand ps-3" href="index.html">MENTOREE</a>
-            <!-- Sidebar Toggle-->
-            <button class="btn btn-link btn-sm order-1 order-lg-0 me-4 me-lg-0" id="sidebarToggle" href="#!"><i class="fas fa-bars"></i></button>
-            <div class="d-none d-md-inline-block form-inline ms-auto me-0 me-md-3 my-2 my-md-0"></div>
-            <!-- Navbar-->
-            <ul class="navbar-nav ms-auto ms-md-0 me-3 me-lg-4">
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" id="navbarDropdown" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false"><i class="fas fa-user fa-fw"></i></a>
-                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
-                        <li><a class="dropdown-item" href="#!">프로필</a></li>
-                        <li><a class="dropdown-item" href="#!">내 프로그램</a></li>
-                        <li><hr class="dropdown-divider" /></li>
-                        <li><a class="dropdown-item" href="#!">로그아웃</a></li>
-                    </ul>
-                </li>
-            </ul>
-        </nav>
+        <nav th:replace="fragments/nav :: nav" />
         <div id="layoutSidenav">
             <div id="layoutSidenav_nav">
-                <nav class="sb-sidenav accordion sb-sidenav-dark" id="sidenavAccordion">
-                    <div class="sb-sidenav-menu">
-                        <div class="nav">
-                            <div class="sb-sidenav-menu-heading">MATCH</div>
-                            <a class="nav-link" href="index.html">
-                                <div class="sb-nav-link-icon"><i class="fas fa-search"></i></div>
-                                프로그램 찾기
-                            </a>
-                            <div class="sb-sidenav-menu-heading">MY MENU</div>
-                            <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapseLayouts" aria-expanded="false" aria-controls="collapseLayouts">
-                                <div class="sb-nav-link-icon"><i class="fas fa-columns"></i></div>
-                                내 프로그램
-                                <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
-                            </a>
-                            <div class="collapse" id="collapseLayouts" aria-labelledby="headingOne" data-bs-parent="#sidenavAccordion">
-                                <nav class="sb-sidenav-menu-nested nav">
-                                    <a class="nav-link" href="layout-static.html">프로그램 소개</a>
-                                    <a class="nav-link" href="layout-sidenav-light.html">미션</a>
-                                    <a class="nav-link" href="layout-sidenav-light.html">수행보드</a>
-                                </nav>
-                            </div>                            
-                        </div>
-                    </div>
-                </nav>
+                <nav th:replace="fragments/sidenav :: sidenav" />
             </div>
             <div id="layoutSidenav_content">
                 <main>
                     <div class="container-fluid px-4">
-                        <h1 class="mt-4">진행중인 미션 이름</h1>
+                        <h1 class="mt-4" th:text="${boardInfo.missionTitle}">진행중인 미션 이름</h1>
                         <ol class="breadcrumb mb-4">
-                            <li class="breadcrumb-item active">작성자 아이디</li>
+                            <li class="breadcrumb-item active" th:text="${boardInfo.writerNickname}">작성자 아이디</li>
                         </ol>
                         <div class="row">
                             <div class="col-xl-12 col-md-12">
@@ -63,41 +22,35 @@
                                         수행 내용
                                     </div>
                                     <div class="card-body">
-                                        <span>수행 했던 내용을 표기</span>
+                                        <span th:text="${boardInfo.content}">수행 했던 내용을 표기</span>
                                     </div>
                                 </div>
                             </div>
                         </div>
+                        <!-- 피드백 댓글 작성 -->
                         <div class="card">
                             <div class="row">
-                                <div id="comment-row" class="col-md-12">
-                                    <label class="mx-3 mt-3">댓글 작성</label>
-                                    <textarea style="width: 95%; overflow: scroll;" class="w-80 mx-3 mt-3" id="new-comment" name="feedback" placeholder="내용을 입력해주세요"></textarea>
-                                </div>
-                                <div class="col-md-2">
-                                    <button class="btn btn-primary mx-3 my-2" type="submit" onclick="">작성하기</button>
-                                </div>
+                                <form th:action="" th:object="${replyCreateForm}" method="post">
+                                    <div id="comment-row" class="col-md-12">
+                                        <label class="mx-3 mt-3">댓글 작성</label>
+                                        <textarea style="width: 95%; overflow: scroll;" class="w-80 mx-3 mt-3" id="new-comment" name="content" placeholder="내용을 입력해주세요"></textarea>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <input type="hidden" th:value="${boardInfo.id}" />
+                                        <button class="btn btn-primary mx-3 my-2" type="submit" onclick="">작성하기</button>
+                                    </div>
+                                </form>
                             </div>
                         </div>
-                        <div class="card my-3">
-                            <span class="mx-3 mt-2" style="font-size: 0.8em; color: #c1c1c1">2020-20-20 00:00:00</span>
+                        <!-- 다른 피드백 댓글 공간 -->
+                        <div class="card my-3" th:each="reply : ${replyList}">
+                            <span class="mx-3 mt-2" style="font-size: 0.8em; color: #c1c1c1" th:text="${reply.modifiedDate}">2020-20-20 00:00:00</span>
                             <div class="row mb-2">
                                 <div class="col-md-1">
-                                    <span class="mx-3">작성자</span>
+                                    <span class="mx-3" th:text="${reply.writerNickname}">작성자</span>
                                 </div>
                                 <div class="col-md-11">
-                                    <span class="mx-3"> 피드백 내용</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="card my-3">
-                            <span class="mx-3 mt-2" style="font-size: 0.8em; color: #c1c1c1">2020-20-20 00:00:00</span>
-                            <div class="row mb-2">
-                                <div class="col-md-1">
-                                    <span class="mx-3">작성자</span>
-                                </div>
-                                <div class="col-md-11">
-                                    <span class="mx-3"> 피드백 내용</span>
+                                    <span class="mx-3" th:text="${reply.content}"> 피드백 내용</span>
                                 </div>
                             </div>
                         </div>

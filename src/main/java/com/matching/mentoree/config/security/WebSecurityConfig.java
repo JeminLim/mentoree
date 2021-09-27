@@ -2,6 +2,7 @@ package com.matching.mentoree.config.security;
 
 import com.matching.mentoree.config.security.util.CookieUtil;
 import com.matching.mentoree.config.security.util.JwtUtils;
+import com.matching.mentoree.repository.ParticipantRepository;
 import com.matching.mentoree.repository.TokenRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
@@ -24,6 +25,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     private final JwtUtils jwtUtils;
     private final CookieUtil cookieUtil;
     private final TokenRepository tokenRepository;
+    private final ParticipantRepository participantRepository;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -42,7 +44,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
         http
                 .formLogin()
-                .successHandler(new CustomAuthenticationSuccessHandler(cookieUtil, jwtUtils, tokenRepository))
+                .successHandler(new CustomAuthenticationSuccessHandler(cookieUtil, jwtUtils, tokenRepository, participantRepository))
                 .failureHandler(new CustomAuthenticationFailureHandler())
                 .loginPage("/login")
                 .loginProcessingUrl("/login/process")
@@ -51,7 +53,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         http
                 .oauth2Login()
                 .loginPage("/login")
-                .successHandler(new CustomAuthenticationSuccessHandler(cookieUtil, jwtUtils, tokenRepository))
+                .successHandler(new CustomAuthenticationSuccessHandler(cookieUtil, jwtUtils, tokenRepository, participantRepository))
                 .failureHandler(new CustomAuthenticationFailureHandler())
                 .userInfoEndpoint()
                 .userService(customUserDetailService);

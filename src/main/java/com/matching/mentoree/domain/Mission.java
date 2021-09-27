@@ -22,13 +22,13 @@ public class Mission extends BaseTimeEntity {
     @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "program_id")
     private Program program;
-
+    private String goal;
     private String title;
     private String content;
     private LocalDateTime dueDate;
 
     @Builder
-    public Mission(Program program, String title, String content, LocalDateTime dueDate) {
+    public Mission(Program program, String title, String content, LocalDateTime dueDate, String goal) {
         Assert.notNull(program, "program must not be null");
         Assert.notNull(title, "title must not be null");
         Assert.notNull(content, "content must not be null");
@@ -37,6 +37,7 @@ public class Mission extends BaseTimeEntity {
         this.program = program;
         this.title = title;
         this.content = content;
+        this.goal = goal;
         this.dueDate = dueDate;
     }
 

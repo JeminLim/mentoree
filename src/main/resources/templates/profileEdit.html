@@ -3,64 +3,23 @@
     <head th:replace="fragments/header :: header" />
     <link href="css/profileStyle.css" rel="stylesheet" />
     <body class="sb-nav-fixed">
-        <nav class="sb-topnav navbar navbar-expand navbar-dark bg-dark">
-            <!-- Navbar Brand-->
-            <a class="navbar-brand ps-3" href="index.html">MENTOREE</a>
-            <!-- Sidebar Toggle-->
-            <button class="btn btn-link btn-sm order-1 order-lg-0 me-4 me-lg-0" id="sidebarToggle" href="#!"><i class="fas fa-bars"></i></button>
-            <div class="d-none d-md-inline-block form-inline ms-auto me-0 me-md-3 my-2 my-md-0"></div>
-            <!-- Navbar-->
-            <ul class="navbar-nav ms-auto ms-md-0 me-3 me-lg-4">
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" id="navbarDropdown" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false"><i class="fas fa-user fa-fw"></i></a>
-                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
-                        <li><a class="dropdown-item" href="#!">프로필</a></li>
-                        <li><a class="dropdown-item" href="#!">내 프로그램</a></li>
-                        <li><hr class="dropdown-divider" /></li>
-                        <li><a class="dropdown-item" href="#!">로그아웃</a></li>
-                    </ul>
-                </li>
-            </ul>
-        </nav>
+        <nav th:replace="fragments/nav :: nav" />
         <div id="layoutSidenav">
             <div id="layoutSidenav_nav">
-                <nav class="sb-sidenav accordion sb-sidenav-dark" id="sidenavAccordion">
-                    <div class="sb-sidenav-menu">
-                        <div class="nav">
-                            <div class="sb-sidenav-menu-heading">MATCH</div>
-                            <a class="nav-link" href="index.html">
-                                <div class="sb-nav-link-icon"><i class="fas fa-search"></i></div>
-                                프로그램 찾기
-                            </a>
-                            <div class="sb-sidenav-menu-heading">MY MENU</div>
-                            <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapseLayouts" aria-expanded="false" aria-controls="collapseLayouts">
-                                <div class="sb-nav-link-icon"><i class="fas fa-columns"></i></div>
-                                내 프로그램
-                                <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
-                            </a>
-                            <div class="collapse" id="collapseLayouts" aria-labelledby="headingOne" data-bs-parent="#sidenavAccordion">
-                                <nav class="sb-sidenav-menu-nested nav">
-                                    <a class="nav-link" href="layout-static.html">프로그램 소개</a>
-                                    <a class="nav-link" href="layout-sidenav-light.html">미션</a>
-                                    <a class="nav-link" href="layout-sidenav-light.html">수행보드</a>
-                                </nav>
-                            </div>                            
-                        </div>
-                    </div>
-                </nav>
+                <nav th:replace="fragments/sidenav :: sidenav" />
             </div>
             <div id="layoutSidenav_content">
                 <main>
                     <div class="container-fluid">
                         <div class="row">
-                            <h2 class="header-pos">본인 아이디 님의 프로필</h2>
-                            <form th:action="@{/user/profile}" role="form" id="userInfoForm" method="post" >
+                            <h2 class="header-pos" th:text="${editForm.nickname}">본인 아이디 님의 프로필</h2>
+                            <form th:action="@{/user/profile}" th:object="${editForm}" role="form" id="userInfoForm" method="post" >
                                 <div class="row d-flex">
                                     <aside class="leftSection col-md-2">
                                         <label>프로필 사진</label>
                                     </aside>
                                     <div class="rightSection col-md-7">
-                                        <img src="non_profile.png" height="100">
+                                        <img th:src="${editForm.imgUrl}" height="100">
                                     </div>
                                 </div>
 
@@ -69,7 +28,7 @@
                                         <label>이메일</label>
                                     </aside>
                                     <div class="rightSection col-md-7">
-                                        <input class="infoInput" type="text" placeHolder="이메일" name="accountEmail" id="inputUserEmail" th:value="${session.login.accountEmail}" readonly/>
+                                        <input class="infoInput" type="text" placeHolder="이메일" name="email" id="inputUserEmail" th:value="${editForm.email}" readonly/>
                                     </div>
                                 </div>
 
@@ -78,7 +37,7 @@
                                         <label>이름</label>
                                     </aside>
                                     <div class="rightSection col-md-7">
-                                        <input class="infoInput" type="text" placeHolder="이름" name="accountName" id="inputUserName" th:value="${session.login.accountName}"/>
+                                        <input class="infoInput" type="text" placeHolder="이름" name="memberName" id="inputUserName" th:value="${editForm.memberName}"/>
                                     </div>
                                 </div>
 
@@ -87,7 +46,7 @@
                                         <label>닉네임</label>
                                     </aside>
                                     <div class="rightSection col-md-7">
-                                        <input class="infoInput" type="text" placeHolder="사용자 이름" name="accountId" id="inputUserId" th:value="${session.login.accountId}"/>
+                                        <input class="infoInput" type="text" placeHolder="사용자 이름" name="nickname" id="inputUserId" th:value="${editForm.nickname}"/>
                                     </div>
                                 </div>
 
@@ -96,7 +55,7 @@
                                         <label>경력소개</label>
                                     </aside>
                                     <div class="rightSection col-md-7">
-                                        <textarea class="infoInput" name="description" style="height: 200px" id="inputUserDesc" th:text="${session.login.description}"></textarea>
+                                        <textarea class="infoInput" name="link" style="height: 200px" id="inputUserDesc" th:text="${editForm.link}"></textarea>
                                         <div class="additionalInfo">
                                             <p class="desc descInfo">자신의 관심분야와 관련된 경력을 알 수 있도록, 간략한 소개 및 링크를 부탁드려요</p>
                                         </div>

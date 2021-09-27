@@ -10,6 +10,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDateTime;
 
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -17,15 +18,17 @@ public class MissionDTO {
 
     private Long programId;
     private String title;
+    private String goal;
     private String content;
     @DateTimeFormat(pattern = "yyyy-mm-dd")
     private LocalDateTime dueDate;
 
     @Builder
-    public MissionDTO(Long programId, String title, String content, LocalDateTime dueDate) {
+    public MissionDTO(Long programId, String title, String content, String goal, LocalDateTime dueDate) {
         this.programId = programId;
         this.title = title;
         this.content = content;
+        this.goal = goal;
         this.dueDate = dueDate;
     }
 

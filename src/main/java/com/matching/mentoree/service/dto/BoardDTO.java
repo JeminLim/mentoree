@@ -1,48 +1,45 @@
 package com.matching.mentoree.service.dto;
 
+import com.matching.mentoree.domain.Board;
 import com.matching.mentoree.domain.Member;
-import com.matching.mentoree.domain.MenteeBoard;
-import com.matching.mentoree.domain.MentorBoard;
 import com.matching.mentoree.domain.Mission;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@Getter
-@Setter
-@NoArgsConstructor
+import java.util.List;
+
 public class BoardDTO {
 
-    private Long missionId;
-    private Long memberId;
-    private Long menteeBoardId;
-    private String content;
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    public static class BoardInfo {
 
-    @Builder
-    public BoardDTO(Long missionId, Long memberId, Long menteeBoardId, String content) {
-        this.missionId = missionId;
-        this.memberId = memberId;
-        this.menteeBoardId = menteeBoardId;
-        this.content = content;
+        private Long boardId;
+        private Long missionId;
+        private String missionTitle;
+        private String writerNickname;
+        private String content;
+
+        @Builder
+        public BoardInfo(Long boardId, Long missionId, String missionTitle, String content, String writerNickname) {
+            this.boardId = boardId;
+            this.missionId = missionId;
+            this.missionTitle = missionTitle;
+            this.writerNickname = writerNickname;
+            this.content = content;
+        }
+
+        public Board toEntity(Mission mission, Member writer) {
+            return Board.builder()
+                    .mission(mission)
+                    .writer(writer)
+                    .content(content)
+                    .build();
+        }
+
     }
-
-    public MenteeBoard toMenteeBoardEntity(Mission mission, Member writer) {
-        return MenteeBoard.builder()
-                .mission(mission)
-                .writer(writer)
-                .content(content)
-                .build();
-    }
-
-    public MentorBoard toMentorBoardEntity(MenteeBoard menteeBoard, Member writer) {
-        return MentorBoard.builder()
-                .menteeBoard(menteeBoard)
-                .writer(writer)
-                .feedback(content)
-                .build();
-    }
-
-
 
 }

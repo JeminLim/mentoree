@@ -3,11 +3,12 @@ package com.matching.mentoree.domain;
 import lombok.*;
 import org.springframework.util.Assert;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
+import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+
+import static javax.persistence.FetchType.*;
 
 @Entity
 @Getter
@@ -24,7 +25,14 @@ public class Program extends BaseTimeEntity{
     private String description;
     private String goal;
     private int maxMember;
+
+    @OneToOne(fetch = LAZY)
+    @JoinColumn(name = "category_id")
+    private Category category;
     //========================//
+
+    @OneToMany(mappedBy = "program")
+    private List<Participant> participants = new ArrayList<>();
 
     private int curNum;
     private boolean isOpen;
@@ -32,7 +40,7 @@ public class Program extends BaseTimeEntity{
 
 
     @Builder
-    public Program(String programName, String description, int maxMember, String goal) {
+    public Program(String programName, String description, int maxMember, String goal, Category category) {
         Assert.notNull(programName, "program name must not be null");
         Assert.notNull(description, "description must not be null");
         Assert.notNull(goal, "goal must not be null");
@@ -44,6 +52,7 @@ public class Program extends BaseTimeEntity{
         this.goal = goal;
         this.isOpen = true;
         this.curNum = 1;
+        this.category = category;
     }
 
     //== 변경 로직 ==//

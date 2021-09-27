@@ -44,25 +44,28 @@ public class MemberDTO {
 
     @Getter
     @Setter
+    @NoArgsConstructor
     public static class MemberInfo {
 
+        private Long id;
         private String email;
         private String memberName;
         private String nickname;
-        private String originProfileImgUrl;
-        private String thumbnailImgUrl;
+        private String imgUrl;
         private String link;
         private List<Program> programList = new ArrayList<>();
+        private Boolean isLogin;
 
         @Builder
-        public MemberInfo(String email, String memberName, String nickname, String originProfileImgUrl, String thumbnailImgUrl, String link, List<Program> programList) {
+        public MemberInfo(Long id, String email, String memberName, String nickname, String imgUrl, String link, List<Program> programList, Boolean isLogin) {
+            this.id = id;
             this.email = email;
             this.memberName = memberName;
             this.nickname = nickname;
-            this.originProfileImgUrl = originProfileImgUrl;
-            this.thumbnailImgUrl = thumbnailImgUrl;
+            this.imgUrl = imgUrl;
             this.link = link;
             this.programList = programList;
+            this.isLogin = isLogin;
         }
 
         public Member toEntity() {
@@ -70,8 +73,6 @@ public class MemberDTO {
                     .email(email)
                     .memberName(memberName)
                     .nickname(nickname)
-                    .originProfileImgUrl(originProfileImgUrl)
-                    .thumbnailImgUrl(thumbnailImgUrl)
                     .link(link)
                     .build();
         }

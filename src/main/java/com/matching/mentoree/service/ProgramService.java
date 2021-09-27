@@ -21,7 +21,6 @@ public class ProgramService {
 
     private final ProgramRepository programRepository;
     private final CategoryRepository categoryRepository;
-    private final ProgramCategoryRepository programCategoryRepository;
     private final ParticipantRepository participantRepository;
     private final MemberRepository memberRepository;
 
@@ -29,22 +28,11 @@ public class ProgramService {
      * 프로그램 생성
      */
     @Transactional
-    public void createProgram(ProgramDTO createDTO, Member login) {
+    public void createProgram(ProgramDTO.ProgramCreateDTO createDTO, Member login) {
 
         Program program = programRepository.save(createDTO.toEntity());
 
-        List<Category> categories = createDTO.getCategories().stream()
-                                    .map(c -> Category.builder().categoryName(c).build())
-                                    .collect(Collectors.toList());
-
-        categories.stream().forEach(c -> categoryRepository.save(c));
-
-        categories.stream().forEach(c ->
-                programCategoryRepository.save(ProgramCategory.builder()
-                        .category(c)
-                        .program(program)
-                        .build())
-        );
+        String category = createDTO.getCategory();
 
         Participant participant = Participant.builder()
                                     .program(program)
@@ -60,7 +48,7 @@ public class ProgramService {
      * 프로그램 수정
      */
     @Transactional
-    public void updateProgramInfo(ProgramDTO updateForm, Long programId) {
+    public void updateProgramInfo(ProgramDTO.ProgramCreateDTO updateForm, Long programId) {
         Program program = programRepository.findById(programId).orElseThrow(NoSuchElementException::new);
 
         if(updateForm.getProgramName() != null && !updateForm.getProgramName().equals(program.getProgramName()))
@@ -80,13 +68,14 @@ public class ProgramService {
      *  프로그램 참여 신청
      */
     @Transactional
-    public void applyProgram(Member applyMember, String role, Long programId) {
+    public void applyProgram(Member applyMember, ProgramRole role, Long programId, String message) {
         Program targetProgram = programRepository.findById(programId).orElseThrow(NoSuchElementException::new);
 
         participantRepository.save(Participant.builder()
                 .program(targetProgram)
                 .member(applyMember)
-                .role(ProgramRole.valueOf(role))
+                .message(message)
+                .role(role)
                 .isHost(false)
                 .approval(false)
                 .build());

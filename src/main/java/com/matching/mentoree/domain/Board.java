@@ -11,35 +11,35 @@ import static javax.persistence.FetchType.*;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @EqualsAndHashCode
-public class MentorBoard extends BaseTimeEntity {
+public class Board extends BaseTimeEntity {
 
     @Id @GeneratedValue
-    @Column(name = "mentor_board_id")
+    @Column(name = "board_id")
     private Long id;
 
     @ManyToOne(fetch = LAZY)
-    @JoinColumn(name = "mentee_board_id")
-    private MenteeBoard menteeBoard;
+    @JoinColumn(name = "mission_id")
+    private Mission mission;
 
     @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "member_id")
     private Member writer;
 
-    private String feedback;
-
+    private String content;
 
     @Builder
-    public MentorBoard(MenteeBoard menteeBoard, String feedback, Member writer) {
-        Assert.notNull(menteeBoard, "menteeboard must not be null");
-        Assert.notNull(feedback, "feedback must not be null");
+    public Board(Mission mission, String content, Member writer) {
+        Assert.notNull(mission, "mission must not be null");
+        Assert.notNull(content, "content must not be null");
         Assert.notNull(writer, "writer must not be null");
 
-        this.menteeBoard = menteeBoard;
-        this.feedback = feedback;
+        this.mission = mission;
+        this.content = content;
         this.writer = writer;
     }
 
     //== 변경 로직 ==//
-    public void updateFeedback(String feedback) { this.feedback = feedback; }
+    public void updateContent(String content) { this.content = content; }
+
 
 }

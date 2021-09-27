@@ -2,58 +2,20 @@
 <html xmlns:th="http://www.thymeleaf.org">
     <head th:replace="fragments/header :: header" />
     <body class="sb-nav-fixed">
-        <nav class="sb-topnav navbar navbar-expand navbar-dark bg-dark">
-            <!-- Navbar Brand-->
-            <a class="navbar-brand ps-3" href="index.html">MENTOREE</a>
-            <!-- Sidebar Toggle-->
-            <button class="btn btn-link btn-sm order-1 order-lg-0 me-4 me-lg-0" id="sidebarToggle" href="#!"><i class="fas fa-bars"></i></button>
-            <div class="d-none d-md-inline-block form-inline ms-auto me-0 me-md-3 my-2 my-md-0"></div>
-            <!-- Navbar-->
-            <ul class="navbar-nav ms-auto ms-md-0 me-3 me-lg-4">
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" id="navbarDropdown" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false"><i class="fas fa-user fa-fw"></i></a>
-                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
-                        <li><a class="dropdown-item" href="#!">프로필</a></li>
-                        <li><a class="dropdown-item" href="#!">내 프로그램</a></li>
-                        <li><hr class="dropdown-divider" /></li>
-                        <li><a class="dropdown-item" href="#!">로그아웃</a></li>
-                    </ul>
-                </li>
-            </ul>
-        </nav>
+        <nav th:replace="fragments/nav :: nav" />
         <div id="layoutSidenav">
             <div id="layoutSidenav_nav">
-                <nav class="sb-sidenav accordion sb-sidenav-dark" id="sidenavAccordion">
-                    <div class="sb-sidenav-menu">
-                        <div class="nav">
-                            <div class="sb-sidenav-menu-heading">MATCH</div>
-                            <a class="nav-link" href="index.html">
-                                <div class="sb-nav-link-icon"><i class="fas fa-search"></i></div>
-                                프로그램 찾기
-                            </a>
-                            <div class="sb-sidenav-menu-heading">MY MENU</div>
-                            <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapseLayouts" aria-expanded="false" aria-controls="collapseLayouts">
-                                <div class="sb-nav-link-icon"><i class="fas fa-columns"></i></div>
-                                내 프로그램
-                                <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
-                            </a>
-                            <div class="collapse" id="collapseLayouts" aria-labelledby="headingOne" data-bs-parent="#sidenavAccordion">
-                                <nav class="sb-sidenav-menu-nested nav">
-                                    <a class="nav-link" href="layout-static.html">프로그램 소개</a>
-                                    <a class="nav-link" href="layout-sidenav-light.html">미션</a>
-                                    <a class="nav-link" href="layout-sidenav-light.html">수행보드</a>
-                                </nav>
-                            </div>                            
-                        </div>
-                    </div>
-                </nav>
+                <nav th:replace="fragments/sidenav :: sidenav" />
             </div>
             <div id="layoutSidenav_content">
                 <main>
                     <div class="container-fluid px-4">
-                        <h1 class="mt-4">프로그램 이름</h1>
+                        <h1 class="mt-4" th:text="${program.title}">프로그램 이름</h1>
                         <ol class="breadcrumb mb-4">
-                            <li class="breadcrumb-item active">현재 진행중인 미션</li>
+                            <li class="breadcrumb-item active">
+                                현재 진행중인 미션
+                                <button class="btn btn-primary btn-sm" th:href="@{'/' + ${program.id} + '/mission/write}'"> 미션 생성</button>
+                            </li>
                         </ol>
                         <div class="row">
                             <div class="col-xl-4 col-md-6">
@@ -62,22 +24,22 @@
                                         <i class="fas fa-clone me-1"></i>
                                         미션 카드
                                     </div>
-                                    <div class="card-body">
+                                    <div class="card-body" th:each="curMission : ${program.curMission}">
                                         <table class="w-100">
                                             <tbody>
                                             <tr>
                                                 <td style="font:bold;" width="20%">제목</td>
-                                                <td width="80%">나는 프로그래머다</td>
+                                                <td width="80%" th:text="${curMission.title}">나는 프로그래머다</td>
                                             </tr>
                                             <tr>
                                                 <td style="font:bold;" width="20%">기간</td>
-                                                <td width="80%">21.08.01 - 21.08.07</td>
+                                                <td width="80%" th:text="${#calendars.format(curMission.createdDate, 'yy.mm.dd') - #calendars.format(curMission.endDate, 'yy.mm.dd')}">21.08.01 - 21.08.07</td>
                                             </tr>
                                             <tr>
                                                 <td style="font:bold;" colspan="2" width="100%">미션 내용</td>
                                             </tr>
                                             <tr>
-                                                <td colspan="2" width="100%">
+                                                <td colspan="2" width="100%" th:text="${curMission.description}">
                                                     미션에 대한 내용 설명 <br/>
                                                     엄청나게 많은 내용 <br/>
                                                     멘티들이 해야할 내용 <br/>
@@ -92,7 +54,7 @@
                                 <li class="breadcrumb-item active">과거 미션 목록</li>
                             </ol>
                             <div class="row">
-                                <div class="col-xl-3">
+                                <div class="col-xl-3" th:each="endMission : ${program.endMission}">
                                     <div class="card mb-4">
                                         <div class="card-header">
                                             <i class="fas fa-clone me-1"></i>
@@ -103,113 +65,17 @@
                                                 <tbody>
                                                 <tr>
                                                     <td style="font:bold;" width="20%">제목</td>
-                                                    <td width="80%">나는 프로그래머다</td>
+                                                    <td width="80%" th:text="${endMission.title}">나는 프로그래머다</td>
                                                 </tr>
                                                 <tr>
                                                     <td style="font:bold;" width="20%">기간</td>
-                                                    <td width="80%">21.08.01 - 21.08.07</td>
+                                                    <td width="80%" th:text="${#calendars.format(endMission.createdDate, 'yy.mm.dd') - #calendars.format(endMission.endDate, 'yy.mm.dd')}">21.08.01 - 21.08.07</td>
                                                 </tr>
                                                 <tr>
                                                     <td style="font:bold;" colspan="2" width="100%">미션 내용</td>
                                                 </tr>
                                                 <tr>
-                                                    <td colspan="2" width="100%">
-                                                        미션에 대한 내용 설명 <br/>
-                                                        엄청나게 많은 내용 <br/>
-                                                        멘티들이 해야할 내용 <br/>
-                                                    </td>
-                                                </tr>
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-xl-3">
-                                    <div class="card mb-4">
-                                        <div class="card-header">
-                                            <i class="fas fa-clone me-1"></i>
-                                            과거 미션
-                                        </div>
-                                        <div class="card-body">
-                                            <table class="w-100">
-                                                <tbody>
-                                                <tr>
-                                                    <td style="font:bold;" width="20%">제목</td>
-                                                    <td width="80%">나는 프로그래머다</td>
-                                                </tr>
-                                                <tr>
-                                                    <td style="font:bold;" width="20%">기간</td>
-                                                    <td width="80%">21.08.01 - 21.08.07</td>
-                                                </tr>
-                                                <tr>
-                                                    <td style="font:bold;" colspan="2" width="100%">미션 내용</td>
-                                                </tr>
-                                                <tr>
-                                                    <td colspan="2" width="100%">
-                                                        미션에 대한 내용 설명 <br/>
-                                                        엄청나게 많은 내용 <br/>
-                                                        멘티들이 해야할 내용 <br/>
-                                                    </td>
-                                                </tr>
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-xl-3">
-                                    <div class="card mb-4">
-                                        <div class="card-header">
-                                            <i class="fas fa-clone me-1"></i>
-                                            과거 미션
-                                        </div>
-                                        <div class="card-body">
-                                            <table class="w-100">
-                                                <tbody>
-                                                <tr>
-                                                    <td style="font:bold;" width="20%">제목</td>
-                                                    <td width="80%">나는 프로그래머다</td>
-                                                </tr>
-                                                <tr>
-                                                    <td style="font:bold;" width="20%">기간</td>
-                                                    <td width="80%">21.08.01 - 21.08.07</td>
-                                                </tr>
-                                                <tr>
-                                                    <td style="font:bold;" colspan="2" width="100%">미션 내용</td>
-                                                </tr>
-                                                <tr>
-                                                    <td colspan="2" width="100%">
-                                                        미션에 대한 내용 설명 <br/>
-                                                        엄청나게 많은 내용 <br/>
-                                                        멘티들이 해야할 내용 <br/>
-                                                    </td>
-                                                </tr>
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-xl-3">
-                                    <div class="card mb-4">
-                                        <div class="card-header">
-                                            <i class="fas fa-clone me-1"></i>
-                                            과거 미션
-                                        </div>
-                                        <div class="card-body">
-                                            <table class="w-100">
-                                                <tbody>
-                                                <tr>
-                                                    <td style="font:bold;" width="20%">제목</td>
-                                                    <td width="80%">나는 프로그래머다</td>
-                                                </tr>
-                                                <tr>
-                                                    <td style="font:bold;" width="20%">기간</td>
-                                                    <td width="80%">21.08.01 - 21.08.07</td>
-                                                </tr>
-                                                <tr>
-                                                    <td style="font:bold;" colspan="2" width="100%">미션 내용</td>
-                                                </tr>
-                                                <tr>
-                                                    <td colspan="2" width="100%">
+                                                    <td colspan="2" width="100%" th:text="${endMission.description}">
                                                         미션에 대한 내용 설명 <br/>
                                                         엄청나게 많은 내용 <br/>
                                                         멘티들이 해야할 내용 <br/>

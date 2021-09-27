@@ -40,7 +40,7 @@ class ProgramServiceTest {
     @InjectMocks
     private ProgramService programService;
 
-    private ProgramDTO programDTO;
+    private ProgramDTO.ProgramCreateDTO programDTO;
     private Member member;
 
     @BeforeEach
@@ -48,7 +48,7 @@ class ProgramServiceTest {
         List<String> categories = new ArrayList<>();
         categories.add("test");
 
-        programDTO = ProgramDTO.builder()
+        programDTO = ProgramDTO.ProgramCreateDTO.builder()
                 .programName("test program")
                 .targetNumber(5)
                 .description("awesome program")
@@ -104,7 +104,7 @@ class ProgramServiceTest {
     @DisplayName("프로그램 수정 테스트 성공")
     public void update_program_info_test() throws Exception {
         //given
-        ProgramDTO newDto = ProgramDTO.builder()
+        ProgramDTO.ProgramCreateDTO newDto = ProgramDTO.ProgramCreateDTO.builder()
                 .programName("changedName")
                 .description("changedDesc")
                 .targetNumber(22)
@@ -133,7 +133,7 @@ class ProgramServiceTest {
         given(programRepository.findById(any())).willReturn(Optional.of(programDTO.toEntity()));
 
         //when
-        programService.applyProgram(member, "MENTEE", 1L);
+        programService.applyProgram(member, ProgramRole.MENTOR, 1L, "test");
         //then
         verify(participantRepository).save(argThat(participant -> participant.getProgram().equals(programDTO.toEntity())));
     }

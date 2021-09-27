@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<nav class="sb-sidenav accordion sb-sidenav-dark" id="sidenavAccordion" th:fragment="sidenav">
+    <div class="sb-sidenav-menu">
+        <div class="nav">
+            <div class="sb-sidenav-menu-heading">MATCH</div>
+            <a class="nav-link" href="index.html">
+                <div class="sb-nav-link-icon"><i class="fas fa-search"></i></div>
+                프로그램 찾기
+            </a>
+            <div class="sb-sidenav-menu-heading">MY MENU</div>
+            <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapseLayouts" aria-expanded="false" aria-controls="collapseLayouts">
+                <div class="sb-nav-link-icon"><i class="fas fa-columns"></i></div>
+                내 프로그램
+                <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
+            </a>
+            <div class="collapse" id="collapseLayouts" aria-labelledby="headingOne" data-bs-parent="#sidenavAccordion">
+                <nav class="sb-sidenav-menu-nested nav" th:each="program : ${session.participatedPrograms}">
+                    <p style="border-bottom: 1px solid #EEEEEE; margin-bottom: 0; margin-top:5%;" th:text="program.title">프로그램 제목 1</p>
+                    <a class="nav-link" th:href="@{'program/info/' + ${program.id}}">프로그램 정보</a>
+                    <a class="nav-link" th:href="@{'program/' + ${program.id}}">미션</a>
+                </nav>
+            </div>
+        </div>
+    </div>
+</nav>

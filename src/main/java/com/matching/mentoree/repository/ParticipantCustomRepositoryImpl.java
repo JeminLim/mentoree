@@ -2,15 +2,12 @@ package com.matching.mentoree.repository;
 
 
 import com.matching.mentoree.domain.*;
-import com.matching.mentoree.service.dto.ProgramDTO;
-import com.querydsl.core.Tuple;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import javax.persistence.EntityManager;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 import static com.matching.mentoree.domain.QMember.*;
@@ -40,10 +37,13 @@ public class ParticipantCustomRepositoryImpl implements ParticipantCustomReposit
     }
 
     @Override
-    public List<Participant> findAllApplicants(Program program) {
+    public List<Participant> findAllApplicants(Program targetProgram) {
         return queryFactory.selectFrom(participant)
-                .where(participant.program.eq(program),
-                        participant.approval.eq(false))
+                .join(participant.program, program)
+                .join(participant.member, member)
+                .fetchJoin()
+                .where(participant.program.id.eq(targetProgram.getId())
+                        .and(participant.approval.eq(false)))
                 .fetch();
     }
 
@@ -66,7 +66,9 @@ public class ParticipantCustomRepositoryImpl implements ParticipantCustomReposit
                 .join(participant.program, program)
                 .join(participant.member, member)
                 .fetchJoin()
-                .where(participant.program.id.eq(programId))
+                .where(participant.program.id.eq(programId)
+                        .and(participant.role.eq(ProgramRole.MENTOR))
+                        .and(participant.approval.eq(true)))
                 .fetch();
     }
 
@@ -94,6 +96,5 @@ public class ParticipantCustomRepositoryImpl implements ParticipantCustomReposit
                 .fetchOne()
         );
     }
-
 
 }

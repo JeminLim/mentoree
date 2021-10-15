@@ -14,6 +14,8 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
+import static com.matching.mentoree.service.dto.ProgramDTO.*;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -28,11 +30,12 @@ public class ProgramService {
      * 프로그램 생성
      */
     @Transactional
-    public void createProgram(ProgramDTO.ProgramCreateDTO createDTO, Member login) {
+    public void createProgram(ProgramCreateDTO createDTO, Member login) {
 
-        Program program = programRepository.save(createDTO.toEntity());
+        Category category = categoryRepository.findByCategoryName(createDTO.getCategory()).orElseThrow(NoSuchElementException::new);
+        Program program = programRepository.save(createDTO.toEntity(category));
 
-        String category = createDTO.getCategory();
+        log.info("createDTO is mentor? = " + createDTO.getProgramRole());
 
         Participant participant = Participant.builder()
                                     .program(program)
@@ -48,7 +51,7 @@ public class ProgramService {
      * 프로그램 수정
      */
     @Transactional
-    public void updateProgramInfo(ProgramDTO.ProgramCreateDTO updateForm, Long programId) {
+    public void updateProgramInfo(ProgramCreateDTO updateForm, Long programId) {
         Program program = programRepository.findById(programId).orElseThrow(NoSuchElementException::new);
 
         if(updateForm.getProgramName() != null && !updateForm.getProgramName().equals(program.getProgramName()))
@@ -66,11 +69,14 @@ public class ProgramService {
 
     /**
      *  프로그램 참여 신청
+     *  return true - 신청 완료 , false - 중복된 신청
      */
     @Transactional
-    public void applyProgram(Member applyMember, ProgramRole role, Long programId, String message) {
-        Program targetProgram = programRepository.findById(programId).orElseThrow(NoSuchElementException::new);
+    public boolean applyProgram(Member applyMember, ProgramRole role, Long programId, String message) {
+        if(participantRepository.existsByMember(applyMember))
+            return false;
 
+        Program targetProgram = programRepository.findById(programId).orElseThrow(NoSuchElementException::new);
         participantRepository.save(Participant.builder()
                 .program(targetProgram)
                 .member(applyMember)
@@ -79,29 +85,25 @@ public class ProgramService {
                 .isHost(false)
                 .approval(false)
                 .build());
+        return true;
     }
 
     /**
      * 프로그램 참여 승인
      */
     @Transactional
-    public void approval(Long memberId, Long programId) {
-        getParticipant(memberId, programId).approve();
+    public void approval(String email, Long programId) {
+        Participant findParticipant = participantRepository.findParticipantByEmailAndProgram(email, programId).orElseThrow(NoSuchElementException::new);
+        findParticipant.approve();
     }
 
     /**
      * 프로그램 참여 거부
      */
     @Transactional
-    public void reject(Long memberId, Long programId) {
-        participantRepository.delete(getParticipant(memberId, programId));
-    }
-
-
-    private Participant getParticipant(Long memberId, Long programId) {
-        Member findMember = memberRepository.findById(memberId).orElseThrow(NoSuchElementException::new);
-        Program findProgram = programRepository.findById(programId).orElseThrow(NoSuchElementException::new);
-        return participantRepository.findByMemberAndProgram(findMember, findProgram).orElseThrow(NoSuchElementException::new);
+    public void reject(String email, Long programId) {
+        Participant findParticipant = participantRepository.findParticipantByEmailAndProgram(email, programId).orElseThrow(NoSuchElementException::new);
+        participantRepository.delete(findParticipant);
     }
 
 }

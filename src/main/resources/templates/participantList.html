@@ -12,7 +12,7 @@
                     <div class="container-fluid px-4">
                         <h1 class="mt-4">프로그램 신청자 목록</h1>
                         <ol class="breadcrumb mb-4">
-                            <li class="breadcrumb-item active" th:text="${program.title}">현재 프로그램 타이틀</li>
+                            <li class="breadcrumb-item active" th:text="${program.programName}">현재 프로그램 타이틀</li>
                         </ol>
                         <div class="row">
                             <div class="col-xl-9 col-md-9">
@@ -28,15 +28,16 @@
                                                 <td width="15%">신청자 목록</td>
                                                 <td width="60%">가입 신청 메시지</td>
                                                 <td width="10%">역할</td>
-                                                <td width="15%" th:text=" ${curNum} / ${program.maxNum} ">현재인원( ? / ? )</td>
+                                                <td width="15%" th:text="'현재인원 (' + ${program.curNum} + '/' + ${program.maxMember} + ')'">현재인원( ? / ? )</td>
                                             </tr>
-                                            <tr th:each="participant : ${participantList}">
-                                                <td width="15%" th:text="participant.nickname}">신청자 아이디</td>
-                                                <td width="60%" th:text="participant.message}">가입 신청 메시지 입니다.</td>
-                                                <td width="10%" th:text="participant.role}">멘토</td>
+                                            <tr th:each="participant : ${applicants}">
+                                                <td width="15%" th:text="${participant.member.nickname}">신청자 아이디</td>
+                                                <td width="60%" th:text="${participant.message}">가입 신청 메시지 입니다.</td>
+                                                <td width="10%" th:text="${participant.role}">멘토</td>
                                                 <td width="15%">
-                                                    <button class="btn btn-primary" onclick="sendAccept(email)">승낙</button>
-                                                    <button class="btn btn-danger" onclick=""sendAccept(email)">거절</button>
+                                                    <input type="hidden" id="programId" th:value="${program.id}" />
+                                                    <button class="btn btn-primary" th:onclick="acceptBtn([[${participant.member.email}]])">승낙</button>
+                                                    <button class="btn btn-danger" th:onclick="rejectBtn([[${participant.member.email}]])">거절</button>
                                                 </td>
                                             </tr>
                                             </tbody>
@@ -57,11 +58,53 @@
             </div>
         </div>
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
-        <script src="js/scripts.js"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.min.js" crossorigin="anonymous"></script>
-        <script src="assets/demo/chart-area-demo.js"></script>
-        <script src="assets/demo/chart-bar-demo.js"></script>
-        <script src="https://cdn.jsdelivr.net/npm/simple-datatables@latest" crossorigin="anonymous"></script>
-        <script src="js/datatables-simple-demo.js"></script>
+        <script th:src="@{/js/scripts.js}"></script>
+        <script>
+            function acceptBtn(email) {
+                var programId = document.getElementById("programId").value;
+
+                var data = new Object();
+                data.email = email;
+                data.programId = programId;
+
+                $.ajax({
+                    type : "post",
+                    url : "/program/" + programId + "/applicants/accept",
+                    data : data,
+                    dataType: "json",
+                    success: function(data) {
+                        if(data.result === "success") {
+                            window.location.href = "/program/" + programId + "/join";
+                        }
+                    },
+                    error: function(request, status, error) {
+                        alert("code = "+ request.status + " message = " + request.responseText + " error = " + error);
+                    }
+                });
+            }
+
+            function rejectBtn(email) {
+                var programId = document.getElementById("programId").value;
+
+                var data = new Object();
+                data.email = email;
+                data.programId = programId;
+
+                $.ajax({
+                    type : "post",
+                    url : "/program/" + programId + "/applicants/reject",
+                    data : data,
+                    dataType: "json",
+                    success: function(data) {
+                        if(data.result === "success") {
+                            window.location.href = "/program/" + programId + "/applicants";
+                        }
+                    },
+                    error: function(request, status, error) {
+                        alert("code = "+ request.status + " message = " + request.responseText + " error = " + error);
+                    }
+                });
+            }
+        </script>
     </body>
 </html>

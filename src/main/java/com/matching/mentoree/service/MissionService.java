@@ -24,7 +24,7 @@ public class MissionService {
     private final ProgramRepository programRepository;
 
     @Transactional
-    public void createMission(MissionDTO missionDTO, Member member) {
+    public void createMission(MissionDTO missionDTO) {
         Program program = programRepository.findById(missionDTO.getProgramId()).orElseThrow(NoSuchElementException::new);
         missionRepository.save(missionDTO.toEntity(program));
     }

@@ -22,20 +22,20 @@ public class Category extends BaseTimeEntity{
 
     private String categoryName;
 
-    @ManyToOne(fetch = LAZY)
-    @JoinColumn(name = "parent_id")
-    private Category parentCategory;
-
-    @OneToMany(mappedBy = "parentCategory")
-    private List<Category> childCategory = new ArrayList<>();
+//    @ManyToOne(fetch = LAZY)
+//    @JoinColumn(name = "parent_id")
+//    private Category parentCategory;
+//
+//    @OneToMany(mappedBy = "parentCategory")
+//    private List<Category> childCategory = new ArrayList<>();
 
     @Builder
-    public Category(String categoryName, Category parentCategory, List<Category> childCategory) {
+    public Category(String categoryName) {
         Assert.notNull(categoryName, "category name must not be null");
 
         this.categoryName = categoryName;
-        this.parentCategory = parentCategory;
-        this.childCategory = childCategory;
+//        this.parentCategory = parentCategory;
+//        this.childCategory = childCategory;
     }
 
 

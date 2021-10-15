@@ -11,5 +11,6 @@ public interface ParticipantRepository extends ParticipantCustomRepository, JpaR
 
     Optional<Participant> findByMember(Member member);
     Optional<Participant> findByMemberAndProgram(Member member, Program program);
+    boolean existsByMember(Member member);
 
 }

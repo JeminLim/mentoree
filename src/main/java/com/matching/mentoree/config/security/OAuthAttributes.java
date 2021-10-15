@@ -36,10 +36,11 @@ public class OAuthAttributes {
                 .build();
     }
 
-    public Member toEntity() {
+    public Member toEntity(String registrationId) {
         return Member.builder()
                 .memberName(name)
                 .email(email)
+                .oAuthId(registrationId)
                 .role(UserRole.USER)
                 .build();
     }

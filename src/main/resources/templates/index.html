@@ -15,18 +15,25 @@
                                 <h1 class="mt-4">모집 중인 프로그램</h1>
                             </div>
                             <div class="col-xl-1 col-md-1">
-                                <button class="btn btn-primary mt-4" th:href="@{/program/registry}">프로그램 생성</button>
+                                <button id="createBtn" class="btn btn-primary mt-4" onclick="moveToCreateProgram()">프로그램 생성</button>
                             </div>
                         </div>
                         <ol class="breadcrumb mb-4">
                             <li class="breadcrumb-item active">추천 프로그램</li>
                         </ol>
                         <div class="row">
-                            <div class="col-xl-4 col-md-6" th:each="recommendProgram : ${programRecommendList}">
+                            <div class="col-xl-4 col-md-6" th:each="recommendProgram, index : ${programRecommendList}">
                                 <div class="card bg-white text-dark mb-4">
                                     <div class="card-header">
-                                        <i class="fas fa-clone me-1"></i>
-                                        프로그램1
+                                        <div class="d-flex">
+                                            <div class="col-md-10">
+                                                <i class="fas fa-clone me-1"></i>
+                                                <span th:text="'프로그램' + ${index.count}"></span>
+                                            </div>
+                                            <div class="col-md-2">
+                                                <a class="small text-dark stretched-link" th:href="@{'/program/info/' + ${recommendProgram.id}}">자세히 보기</a>
+                                            </div>
+                                        </div>
                                     </div>
                                     <div class="card-body">
                                         <table class="w-100">
@@ -38,7 +45,16 @@
                                                 </tr>
                                                 <tr>
                                                     <td style="font:bold;" width="20%" colspan="1">멘토</td>
-                                                    <td width="80%" colspan="2" th:text="${recommendProgram.mentor}">우리의 멘토</td>
+                                                    <td width="80%" colspan="2">
+                                                        <div th:each="mentor, index : ${recommendProgram.mentor}">
+                                                            <span th:if="${index.last}" th:text="${mentor.member.nickname}">우리의 멘토</span>
+                                                            <span th:unless="${index.last}" th:text="${mentor.member.nickname}, ">우리의 멘토</span>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td width="20%">모집기간</td>
+                                                    <td width="80%" th:text="${#temporals.format(recommendProgram.dueDate, 'yyyy-MM-dd')} + ' 까지'">21.08.07까지</td>
                                                 </tr>
                                                 <tr>
                                                     <td style="font:bold;" width="20%" colspan="1">목표</td>
@@ -48,7 +64,7 @@
                                         </table>
                                     </div>
                                     <div class="card-footer d-flex align-items-center justify-content-between">
-                                        <a class="small text-dark stretched-link" th:href="@{/info/}">자세히 보기</a>
+                                        <a class="small text-dark stretched-link" th:href="@{'/program/info/' + ${recommendProgram.id}}">자세히 보기</a>
                                         <div class="small text-dark"><i class="fas fa-angle-right"></i></div>
                                     </div>
                                 </div>
@@ -58,11 +74,18 @@
                             <li class="breadcrumb-item active">프로그램 목록</li>
                         </ol>
                         <div class="row">
-                            <div class="col-xl-3" th:each="program : ${programList}">
+                            <div class="col-xl-3" th:each="program, index : ${programList}">
                                 <div class="card mb-4">
                                     <div class="card-header">
-                                        <i class="fas fa-clone me-1"></i>
-                                        프로그램1
+                                        <div class="d-flex">
+                                            <div class="col-md-10">
+                                                <i class="fas fa-clone me-1"></i>
+                                                <span th:text="'프로그램' + ${index.count}"></span>
+                                            </div>
+                                            <div class="col-md-2">
+                                                <a class="small text-dark stretched-link" th:href="@{'/program/info/' + ${program.id}}">자세히 보기</a>
+                                            </div>
+                                        </div>
                                     </div>
                                     <div class="card-body"> 
                                         <table class="w-100">
@@ -74,18 +97,25 @@
                                                 <tr>
                                                     <td style="font:bold;" width="20%">멘토</td>
                                                     <td width="80%">
-                                                        <span th:each="mentor : ${program.mentor}" th:text="${mentor.nickname}">우리의 멘토</span>
+                                                        <div th:if="${not #lists.isEmpty(program.mentor)}" th:each="mentorMember, mentorIndex : ${program.mentor}">
+                                                            <span th:if="${mentorIndex.last}" th:text="${mentorMember.member.nickname}">우리의 멘토</span>
+                                                            <span th:unless="${mentorIndex.last}" th:text="${mentorMember.member.nickname}, ">우리의 멘토</span>
+                                                        </div>
                                                     </td>
                                                 </tr>
                                                 <tr>
                                                     <td style="font:bold;" width="20%">인원</td>
-                                                    <td width="80%" th:text="${program.maxNumber}">5명</td>
+                                                    <td width="80%" th:text="${program.maxMember}">5명</td>
                                                 </tr>
                                                 <tr>
                                                     <td style="font:bold;" colspan="2" width="100%">프로그램 분류</td>
                                                 </tr>
                                                 <tr>
                                                     <td colspan="2" width="100%" th:text="${program.category}">IT, Java, Spring-boot, JPA</td>
+                                                </tr>
+                                                <tr>
+                                                    <td width="20%">모집기간</td>
+                                                    <td width="80%" th:text="${#temporals.format(program.dueDate, 'yyyy-MM-dd')} + ' 까지'">21.08.07까지</td>
                                                 </tr>
                                                 <tr>
                                                     <td style="font:bold;" width="20%">목표</td>
@@ -109,5 +139,11 @@
             </div>
         </div>
         <script src="js/scripts.js"></script>
+        <script>
+            function moveToCreateProgram() {
+                document.location.href = "/program/registry";
+            }
+
+        </script>
     </body>
 </html>

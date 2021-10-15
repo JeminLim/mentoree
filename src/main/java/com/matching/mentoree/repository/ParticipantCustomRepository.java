@@ -19,5 +19,4 @@ public interface ParticipantCustomRepository {
     List<Participant> findMentor(Long programId);
     List<ProgramForNavbarDTO> findParticipateProgram(String email);
     Optional<Participant> findHost(Long programId);
-
 }

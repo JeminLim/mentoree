@@ -55,13 +55,7 @@ public class MemberController {
     public String profileBrowseGet(@PathVariable("email") String email, Model model) {
         MemberInfo findMember = memberRepository.findMemberInfoByEmail(email).orElseThrow(NoSuchElementException::new);
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        String userEmail = "";
-        if(auth instanceof DefaultOAuth2User) {
-            userEmail = (String) ((DefaultOAuth2User) auth).getAttributes().get("email");
-        }
-        else if(auth instanceof UsernamePasswordAuthenticationToken) {
-            userEmail = (String) auth.getPrincipal();
-        }
+        String userEmail = (String) auth.getPrincipal();
 
         boolean isLogin = userEmail.equals(email) ? true : false;
         findMember.setIsLogin(isLogin);

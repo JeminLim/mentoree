@@ -19,11 +19,11 @@
                                         미션 작성
                                     </div>
                                     <div class="card-body">
-                                        <form th:action="@{/mission/write}" th:object="${missionForm}" method="post">
+                                        <form th:action="@{'/program/' + ${missionForm.programId} + '/mission/write'}" th:object="${missionForm}" method="post">
                                             <div class="row mb-3">
                                                 <div class="col-md-12">
                                                     <div class="form-floating mb-3 mb-md-0">
-                                                        <input class="form-control" name="title" id="inputProgramTitle" type="text" placeholder="미션 타이틀" name=""/>
+                                                        <input class="form-control" name="title" id="inputProgramTitle" type="text" placeholder="미션 타이틀"/>
                                                         <label for="inputProgramTitle">미션 타이틀</label>
                                                     </div>
                                                 </div>
@@ -51,7 +51,7 @@
                                                 </div>
                                             </div>
                                             <div class="mt-4 mb-0 float-right">
-                                                <input type="hidden" th:value = "${missionForm.programId}"/>
+                                                <input type="hidden" name="programId" th:value ="${missionForm.programId}"/>
                                                 <button type="submit" class="btn btn-primary btn-block pull-right">작성하기</button>
                                             </div>
                                         </form>
@@ -71,11 +71,6 @@
             </div>
         </div>
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
-        <script src="js/scripts.js"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.min.js" crossorigin="anonymous"></script>
-        <script src="assets/demo/chart-area-demo.js"></script>
-        <script src="assets/demo/chart-bar-demo.js"></script>
-        <script src="https://cdn.jsdelivr.net/npm/simple-datatables@latest" crossorigin="anonymous"></script>
-        <script src="js/datatables-simple-demo.js"></script>
+        <script th:src="@{js/scripts.js}"></script>
     </body>
 </html>

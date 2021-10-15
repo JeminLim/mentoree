@@ -13,18 +13,18 @@
                         <h1 class="mt-4" th:text="${program.title}">프로그램 이름</h1>
                         <ol class="breadcrumb mb-4">
                             <li class="breadcrumb-item active">
-                                현재 진행중인 미션
-                                <button class="btn btn-primary btn-sm" th:href="@{'/' + ${program.id} + '/mission/write}'"> 미션 생성</button>
+                                <span>현재 진행중인 미션</span>
+                                <a th:if="${isMentor}" class="btn btn-primary btn-sm" th:href="@{'/program/' + ${program.programId} + '/mission/write'}"> 미션 생성</a>
                             </li>
                         </ol>
                         <div class="row">
-                            <div class="col-xl-4 col-md-6">
+                            <div class="col-xl-4 col-md-6" th:each="curMission : ${program.curMission}">
                                 <div class="card bg-white text-dark mb-4">
                                     <div class="card-header">
                                         <i class="fas fa-clone me-1"></i>
-                                        미션 카드
+                                        <span>미션 카드</span><a style="margin-left:60%; color: #808080; font-size: 0.8em;" th:href="@{'/program/' + ${program.programId} + '/mission/' + ${curMission.missionId} + '/board/list'}"> &#187;수행보드로 이동</a>
                                     </div>
-                                    <div class="card-body" th:each="curMission : ${program.curMission}">
+                                    <div class="card-body" >
                                         <table class="w-100">
                                             <tbody>
                                             <tr>
@@ -33,13 +33,13 @@
                                             </tr>
                                             <tr>
                                                 <td style="font:bold;" width="20%">기간</td>
-                                                <td width="80%" th:text="${#calendars.format(curMission.createdDate, 'yy.mm.dd') - #calendars.format(curMission.endDate, 'yy.mm.dd')}">21.08.01 - 21.08.07</td>
+                                                <td width="80%" th:text="${#temporals.format(curMission.dueDate, 'yyyy-MM-dd')} + ' 까지'">21.08.07까지</td>
                                             </tr>
                                             <tr>
                                                 <td style="font:bold;" colspan="2" width="100%">미션 내용</td>
                                             </tr>
                                             <tr>
-                                                <td colspan="2" width="100%" th:text="${curMission.description}">
+                                                <td colspan="2" width="100%" th:text="${curMission.content}">
                                                     미션에 대한 내용 설명 <br/>
                                                     엄청나게 많은 내용 <br/>
                                                     멘티들이 해야할 내용 <br/>
@@ -68,14 +68,10 @@
                                                     <td width="80%" th:text="${endMission.title}">나는 프로그래머다</td>
                                                 </tr>
                                                 <tr>
-                                                    <td style="font:bold;" width="20%">기간</td>
-                                                    <td width="80%" th:text="${#calendars.format(endMission.createdDate, 'yy.mm.dd') - #calendars.format(endMission.endDate, 'yy.mm.dd')}">21.08.01 - 21.08.07</td>
-                                                </tr>
-                                                <tr>
                                                     <td style="font:bold;" colspan="2" width="100%">미션 내용</td>
                                                 </tr>
                                                 <tr>
-                                                    <td colspan="2" width="100%" th:text="${endMission.description}">
+                                                    <td colspan="2" width="100%" th:text="${endMission.content}">
                                                         미션에 대한 내용 설명 <br/>
                                                         엄청나게 많은 내용 <br/>
                                                         멘티들이 해야할 내용 <br/>

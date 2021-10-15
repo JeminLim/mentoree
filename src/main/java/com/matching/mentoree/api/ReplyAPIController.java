@@ -21,16 +21,7 @@ public class ReplyAPIController {
     private final MemberRepository memberRepository;
     private final BoardRepository boardRepository;
 
-    @PostMapping("/reply")
-    public ReplyDTO replyPost(@ModelAttribute("replyForm") ReplyDTO replyDTO, RedirectAttributes redirect) {
-        Member login = memberRepository.findByEmail(replyDTO.getWriterNickname()).orElseThrow(NoSuchElementException::new);
-        Board board = boardRepository.findById(replyDTO.getBoardId()).orElseThrow(NoSuchElementException::new);
-        replyRepository.save(replyDTO.toEntity(board, login));
-
-        return replyDTO;
-    }
-
-    @GetMapping("/reply/{boardId}")
+    @GetMapping("/program/{programId}/mission/{missionId}/board/{boardId}/reply/list")
     public List<ReplyDTO> getReplies(@PathVariable("boardId") long boardId) {
         Board findBoard = boardRepository.findById(boardId).orElseThrow(NoSuchElementException::new);
         List<ReplyDTO> allByBoard = replyRepository.findRepliesAllByBoard(boardId);

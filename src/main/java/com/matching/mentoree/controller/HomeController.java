@@ -10,6 +10,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -32,13 +33,7 @@ public class HomeController {
     @GetMapping("/")
     public String home(Model model) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        String email = "";
-        if(auth instanceof DefaultOAuth2User) {
-            email = (String) ((DefaultOAuth2User) auth).getAttributes().get("email");
-        }
-        else if(auth instanceof UsernamePasswordAuthenticationToken) {
-            email = (String) auth.getPrincipal();
-        }
+        String email = (String) auth.getPrincipal();
         Member login = memberRepository.findByEmail(email).orElseThrow(NoSuchElementException::new);
 
         // 나중에 페이징으로 쿼리 수정

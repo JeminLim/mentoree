@@ -2,9 +2,11 @@ package com.matching.mentoree.domain;
 
 import lombok.*;
 import org.apache.tomcat.jni.Local;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.util.Assert;
 
 import javax.persistence.*;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import static javax.persistence.FetchType.*;
@@ -22,13 +24,15 @@ public class Mission extends BaseTimeEntity {
     @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "program_id")
     private Program program;
+
     private String goal;
     private String title;
     private String content;
-    private LocalDateTime dueDate;
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    private LocalDate dueDate;
 
     @Builder
-    public Mission(Program program, String title, String content, LocalDateTime dueDate, String goal) {
+    public Mission(Program program, String title, String content, LocalDate dueDate, String goal) {
         Assert.notNull(program, "program must not be null");
         Assert.notNull(title, "title must not be null");
         Assert.notNull(content, "content must not be null");
@@ -44,6 +48,6 @@ public class Mission extends BaseTimeEntity {
     //== 변경 로직 ==//
     public void updateTitle(String title) { this.title = title; }
     public void updateContent(String content) { this.content = content; }
-    public void updateDueDate(LocalDateTime dueDate) { this.dueDate = dueDate; }
+    public void updateDueDate(LocalDate dueDate) { this.dueDate = dueDate; }
 
 }

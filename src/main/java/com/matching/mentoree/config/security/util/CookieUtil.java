@@ -14,8 +14,8 @@ import static com.matching.mentoree.config.security.util.SecurityConstant.ACCESS
 @Component
 public class CookieUtil {
 
-    public void addCookie(HttpServletResponse response, String token) {
-        Cookie cookie = new Cookie(ACCESS_TOKEN, token);
+    public void addCookie(HttpServletResponse response, String token, String tokenName) {
+        Cookie cookie = new Cookie(tokenName, token);
         cookie.setPath("/");
         cookie.setHttpOnly(true);
         cookie.setMaxAge(ACCESS_COOKIE_VALID);

@@ -7,6 +7,9 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.format.annotation.DateTimeFormat;
+
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -16,6 +19,8 @@ public class ReplyDTO {
     private Long boardId;
     private String writerNickname;
     private String content;
+    @DateTimeFormat(pattern = "yyyy-MM-dd 'T' HH:mm:ss")
+    private LocalDateTime modifiedDate;
 
     @Builder
     public ReplyDTO(Long boardId, String writerNickname, String content) {

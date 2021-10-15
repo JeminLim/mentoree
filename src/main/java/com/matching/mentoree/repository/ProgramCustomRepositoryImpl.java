@@ -4,6 +4,7 @@ import com.matching.mentoree.domain.*;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import lombok.extern.slf4j.Slf4j;
 
 import javax.persistence.EntityManager;
 import java.util.ArrayList;
@@ -13,11 +14,13 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static com.matching.mentoree.domain.QCategory.*;
+import static com.matching.mentoree.domain.QMember.*;
 import static com.matching.mentoree.domain.QMemberInterest.*;
 import static com.matching.mentoree.domain.QParticipant.*;
 import static com.matching.mentoree.domain.QProgram.*;
 import static com.matching.mentoree.service.dto.ProgramDTO.*;
 
+@Slf4j
 public class ProgramCustomRepositoryImpl implements ProgramCustomRepository{
 
     private final JPAQueryFactory queryFactory;
@@ -29,10 +32,10 @@ public class ProgramCustomRepositoryImpl implements ProgramCustomRepository{
         List<ProgramInfoDTO> recommendPrograms = queryFactory.select(Projections.fields(ProgramInfoDTO.class,
                 program.programName.as("title"),
                 program.category.categoryName.as("category"),
-                program.endDate,
                 program.maxMember,
                 program.goal,
-                program.description))
+                program.description,
+                program.dueDate))
                 .from(program)
                 .join(program.category, category)
                 .join(program.participants, participant)
@@ -43,50 +46,55 @@ public class ProgramCustomRepositoryImpl implements ProgramCustomRepository{
                 )).fetch();
 
         Map<Long, List<Participant>> mentorInProgram = findMentorInProgram(toProgramIds(recommendPrograms));
-        recommendPrograms.forEach(o -> o.setMentor(mentorInProgram.get(o.getId())));
+        if(mentorInProgram != null)
+            recommendPrograms.forEach(o -> o.setMentor(mentorInProgram.get(o.getId())));
         return recommendPrograms;
     }
 
     @Override
     public List<ProgramInfoDTO> findAllProgram() {
         List<ProgramInfoDTO> allPrograms = queryFactory.select(Projections.bean(ProgramInfoDTO.class,
+                program.id,
                 program.programName.as("title"),
                 program.category.categoryName.as("category"),
-                program.endDate,
                 program.maxMember,
                 program.goal,
-                program.description))
+                program.description,
+                program.dueDate))
                 .from(program)
                 .join(program.category, category)
                 .join(program.participants, participant)
                 .fetch();
 
         Map<Long, List<Participant>> mentorInProgram = findMentorInProgram(toProgramIds(allPrograms));
-        allPrograms.forEach(o -> o.setMentor(mentorInProgram.get(o.getId())));
+        if(mentorInProgram != null)
+            allPrograms.forEach(o -> o.setMentor(mentorInProgram.get(o.getId())));
+
         return allPrograms;
     }
 
     @Override
     public Optional<ProgramInfoDTO> findProgramById(Long programId) {
-        ProgramInfoDTO programInfoDTO = queryFactory.select(Projections.fields(ProgramInfoDTO.class,
+        ProgramInfoDTO programInfoDTO = queryFactory.select(Projections.bean(ProgramInfoDTO.class,
+                program.id,
                 program.programName.as("title"),
                 program.category.categoryName.as("category"),
-                program.endDate,
                 program.maxMember,
                 program.goal,
-                program.description))
+                program.description,
+                program.dueDate))
                 .from(program)
                 .join(program.category, category)
-                .join(program.participants, participant)
                 .where(program.id.eq(programId)).fetchOne();
 
         List<Long> id = new ArrayList<>();
-        id.add(programInfoDTO.getId());
+        id.add(programId);
 
         Map<Long, List<Participant>> mentorInProgram = findMentorInProgram(id);
-        programInfoDTO.setMentor(mentorInProgram.get(id.get(0)));
-        return Optional.of(programInfoDTO);
+        if(mentorInProgram != null)
+            programInfoDTO.setMentor(mentorInProgram.get(id.get(0)));
 
+        return Optional.of(programInfoDTO);
     }
 
     private List<Long> toProgramIds(List<ProgramInfoDTO> result) {
@@ -97,11 +105,13 @@ public class ProgramCustomRepositoryImpl implements ProgramCustomRepository{
 
     private Map<Long, List<Participant>> findMentorInProgram(List<Long> programIds) {
         List<Participant> participants = queryFactory.selectFrom(participant)
+                .join(participant.program, program)
+                .join(participant.member, member)
+                .fetchJoin()
                 .where(participant.program.id.in(programIds).and(participant.role.eq(ProgramRole.MENTOR)))
                 .fetch();
 
-        return participants.stream()
-                .collect(Collectors.groupingBy(Participant::getId));
+        return participants.size() > 0 ? participants.stream().collect(Collectors.groupingBy(p -> p.getProgram().getId())) : null;
     }
 
 }

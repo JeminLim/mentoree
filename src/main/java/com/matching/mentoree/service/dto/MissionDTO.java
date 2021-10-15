@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.format.annotation.DateTimeFormat;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 
@@ -17,15 +18,17 @@ import java.time.LocalDateTime;
 public class MissionDTO {
 
     private Long programId;
+    private Long missionId;
     private String title;
     private String goal;
     private String content;
-    @DateTimeFormat(pattern = "yyyy-mm-dd")
-    private LocalDateTime dueDate;
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    private LocalDate dueDate;
 
     @Builder
-    public MissionDTO(Long programId, String title, String content, String goal, LocalDateTime dueDate) {
+    public MissionDTO(Long programId, Long missionId, String title, String content, String goal, LocalDate dueDate) {
         this.programId = programId;
+        this.missionId = missionId;
         this.title = title;
         this.content = content;
         this.goal = goal;
@@ -37,6 +40,7 @@ public class MissionDTO {
                 .program(program)
                 .title(title)
                 .content(content)
+                .goal(goal)
                 .dueDate(dueDate)
                 .build();
     }

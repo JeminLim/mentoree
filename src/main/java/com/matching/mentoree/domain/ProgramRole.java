@@ -4,8 +4,8 @@ import lombok.Getter;
 
 public enum ProgramRole {
 
-    MENTOR("멘토"),
-    MENTEE("멘티");
+    MENTOR("mentor"),
+    MENTEE("mentee");
 
     private String value;
 

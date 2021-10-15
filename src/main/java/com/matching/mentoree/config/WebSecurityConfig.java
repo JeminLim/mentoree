@@ -1,5 +1,6 @@
-package com.matching.mentoree.config.security;
+package com.matching.mentoree.config;
 
+import com.matching.mentoree.config.security.*;
 import com.matching.mentoree.config.security.util.CookieUtil;
 import com.matching.mentoree.config.security.util.JwtUtils;
 import com.matching.mentoree.repository.ParticipantRepository;
@@ -38,6 +39,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 
         http
+                .csrf().disable()
                 .authorizeRequests()
                 .antMatchers("/login", "/member/**").permitAll()
                 .anyRequest().authenticated();
@@ -62,10 +64,13 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         http
                 .logout()
                 .logoutUrl("/logout")
-                .logoutSuccessUrl("/login");
+                .logoutSuccessUrl("/login")
+                .invalidateHttpSession(true)
+                .deleteCookies("JSESSIONID")
+                .deleteCookies("AccessToken");
 
         http
-                .addFilterAfter(new JwtFilter(jwtUtils), LogoutFilter.class);
+                .addFilterAfter(new JwtFilter(cookieUtil, jwtUtils), LogoutFilter.class);
 
     }
 

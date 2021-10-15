@@ -1,9 +1,11 @@
 package com.matching.mentoree.domain;
 
 import lombok.*;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.util.Assert;
 
 import javax.persistence.*;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -36,11 +38,12 @@ public class Program extends BaseTimeEntity{
 
     private int curNum;
     private boolean isOpen;
-    private LocalDateTime endDate;
 
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    private LocalDate dueDate;
 
     @Builder
-    public Program(String programName, String description, int maxMember, String goal, Category category) {
+    public Program(String programName, String description, int maxMember, String goal, Category category, LocalDate dueDate) {
         Assert.notNull(programName, "program name must not be null");
         Assert.notNull(description, "description must not be null");
         Assert.notNull(goal, "goal must not be null");
@@ -50,9 +53,12 @@ public class Program extends BaseTimeEntity{
         this.description = description;
         this.maxMember = maxMember;
         this.goal = goal;
+        this.dueDate = dueDate;
+        this.category = category;
+
+        // 기본 초기값
         this.isOpen = true;
         this.curNum = 1;
-        this.category = category;
     }
 
     //== 변경 로직 ==//

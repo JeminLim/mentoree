@@ -24,16 +24,16 @@ public class BoardCustomRepositoryImpl implements BoardCustomRepository{
 
     @Override
     public Optional<BoardInfo> findBoardInfoById(Long id) {
-        return Optional.of(
+        return Optional.ofNullable(
                 queryFactory.select(Projections.bean( BoardInfo.class,
-                        board.id,
+                        board.id.as("boardId"),
                         board.mission.id.as("missionId"),
                         board.mission.title.as("missionTitle"),
                         board.writer.nickname.as("writerNickname"),
                         board.content))
-                .join(board.mission, mission)
-                .join(board.writer, member).fetchJoin()
                 .from(board)
+                .join(board.mission, mission)
+                .join(board.writer, member)
                 .where(board.id.eq(id))
                 .fetchOne()
         );
@@ -42,14 +42,14 @@ public class BoardCustomRepositoryImpl implements BoardCustomRepository{
     @Override
     public List<BoardInfo> findAllBoardInfoById(Long missionId) {
         return queryFactory.select(Projections.bean( BoardInfo.class,
-                board.id,
+                board.id.as("boardId"),
                 board.mission.id.as("missionId"),
                 board.mission.title.as("missionTitle"),
                 board.writer.nickname.as("writerNickname"),
                 board.content))
                 .from(board)
                 .join(board.mission, mission)
-                .join(board.writer, member).fetchJoin()
+                .join(board.writer, member)
                 .where(mission.id.eq(missionId))
                 .fetch();
     }

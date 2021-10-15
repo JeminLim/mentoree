@@ -35,6 +35,8 @@ public class CustomUserDetailService implements UserDetailsService, OAuth2UserSe
 
     @Override
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
+        log.info("OAuth login ..." );
+
         OAuth2UserService delegate = new DefaultOAuth2UserService();
         OAuth2User oAuth2User = delegate.loadUser(userRequest);
 
@@ -42,7 +44,7 @@ public class CustomUserDetailService implements UserDetailsService, OAuth2UserSe
         String userNameAttributeName = userRequest.getClientRegistration().getProviderDetails().getUserInfoEndpoint().getUserNameAttributeName();
 
         OAuthAttributes attributes = OAuthAttributes.of(registrationId, userNameAttributeName, oAuth2User.getAttributes());
-        Member member = saveOrUpdate(attributes);
+        Member member = saveOrUpdate(attributes, registrationId);
 
         return new DefaultOAuth2User(
                 Collections.singletonList(new SimpleGrantedAuthority(member.getRole().getKey())),
@@ -51,12 +53,12 @@ public class CustomUserDetailService implements UserDetailsService, OAuth2UserSe
         );
     }
 
-    private Member saveOrUpdate(OAuthAttributes attributes) {
+    private Member saveOrUpdate(OAuthAttributes attributes, String registrationId) {
         Member member = memberRepository.findByEmail(attributes.getEmail())
                 .map(entity -> entity.updateOAuthInfo(attributes.getName()))
-                .orElse(attributes.toEntity());
+                .orElse(attributes.toEntity(registrationId));
 
-        return member;
+        return memberRepository.save(member);
     }
 
 

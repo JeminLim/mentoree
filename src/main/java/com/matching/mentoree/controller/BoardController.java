@@ -8,15 +8,13 @@ import com.matching.mentoree.repository.MemberRepository;
 import com.matching.mentoree.repository.MissionRepository;
 import com.matching.mentoree.repository.ReplyRepository;
 import com.matching.mentoree.service.BoardService;
-import com.matching.mentoree.service.dto.BoardDTO;
 import com.matching.mentoree.service.dto.ReplyDTO;
-import com.matching.mentoree.util.CommonUtil;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -33,29 +31,23 @@ public class BoardController {
     private final ReplyRepository replyRepository;
     private final MissionRepository missionRepository;
 
-    //== Board 작성 ==//
-    @GetMapping("/board/write")
-    public String createBoardGet(@RequestParam("missionId") long missionId, Model model) {
-        BoardInfo boardDTO = new BoardInfo();
-        boardDTO.setMissionId(missionId);
-        Member login = memberRepository.findByEmail((String) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).orElseThrow(NoSuchElementException::new);
-        boardDTO.setWriterNickname(login.getNickname());
 
-        model.addAttribute("boardForm", boardDTO);
-
-        return "boardCreate";
-    }
-
-    @PostMapping("/board/write")
-    public String createBoardPost(@ModelAttribute("boardForm") BoardInfo createForm) {
-        Member login = memberRepository.findByEmail((String)SecurityContextHolder.getContext().getAuthentication().getPrincipal()).orElseThrow(NoSuchElementException::new);
-        boardService.saveBoard(createForm, login);
-        return "redirect:/mission/list";
+    //== 전체 Board 열람 ==//
+    @GetMapping("/program/{programId}/mission/{missionId}/board/list")
+    public String boardListGet(@PathVariable("programId") Long programId, @PathVariable("missionId") Long missionId, Model model) {
+        Mission mission = missionRepository.findById(missionId).orElseThrow(NoSuchElementException::new);
+        model.addAttribute("mission", mission);
+        List<BoardInfo> boards = boardRepository.findAllBoardInfoById(missionId);
+        model.addAttribute("boardList", boards);
+        model.addAttribute("programId", programId);
+        return "board";
     }
 
     //== 개별 Board 열람 ==//
-    @GetMapping("/board/{boardId}")
-    public String boardGet(@PathVariable("boardId") long boardId, Model model) {
+    @GetMapping("/program/{programId}/mission/{missionId}/board/{boardId}")
+    public String boardGet(@PathVariable("programId") Long programId, @PathVariable("boardId") long boardId, Model model) {
+        model.addAttribute("programId", programId);
+
         BoardInfo findBoard = boardRepository.findBoardInfoById(boardId).orElseThrow(NoSuchElementException::new);
         model.addAttribute("boardInfo", findBoard);
 
@@ -68,20 +60,33 @@ public class BoardController {
         return "boardInfo";
     }
 
-    //== 전체 Board 열람 ==//
-    @GetMapping("/{missionId}/board/list")
-    public String boardListGet(@PathVariable("missionId") Long missionId, Model model) {
-        Mission mission = missionRepository.findById(missionId).orElseThrow(NoSuchElementException::new);
-        model.addAttribute("mission", mission);
-        List<BoardInfo> boards = boardRepository.findAllBoardInfoById(missionId);
-        model.addAttribute("boardList", boards);
-        return "board";
+    //== Board 작성 ==//
+    @GetMapping("/program/{programId}/mission/{missionId}/board/write")
+    public String createBoardGet(@PathVariable("programId") Long programId, @PathVariable("missionId") Long missionId, Model model) {
+        BoardInfo boardDTO = new BoardInfo();
+        boardDTO.setMissionId(missionId);
+        Member login = memberRepository.findByEmail((String) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).orElseThrow(NoSuchElementException::new);
+        boardDTO.setWriterNickname(login.getNickname());
+
+        model.addAttribute("programId", programId);
+        model.addAttribute("boardForm", boardDTO);
+
+        return "boardCreate";
     }
 
+    @PostMapping("/program/{programId}/mission/{missionId}/board/write")
+    public String createBoardPost(@ModelAttribute("boardForm") BoardInfo createForm) {
+        Member login = memberRepository.findByEmail((String)SecurityContextHolder.getContext().getAuthentication().getPrincipal()).orElseThrow(NoSuchElementException::new);
+        boardService.saveBoard(createForm, login);
+        return "redirect:" + createForm.getMissionId() + "/mission/list";
+    }
+
+
     //== 댓글 작성 관련 ==//
-    @PostMapping("/reply")
+    @PostMapping("/program/{programId}/mission/{missionId}/board/{boardId}/reply/write")
     public String replyWrite(@ModelAttribute("replyCreateForm") ReplyDTO replyCreateForm) {
-        String loginEmail = CommonUtil.getLoginEmail();
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String loginEmail = (String) auth.getPrincipal();
         Member login = memberRepository.findByEmail(loginEmail).orElseThrow(NoSuchElementException::new);
         Board target = boardRepository.findById(replyCreateForm.getBoardId()).orElseThrow(NoSuchElementException::new);
         replyRepository.save(replyCreateForm.toEntity(target, login));

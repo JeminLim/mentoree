@@ -10,6 +10,7 @@ import com.matching.mentoree.repository.ParticipantRepository;
 import com.matching.mentoree.repository.ProgramRepository;
 import com.matching.mentoree.service.ProgramService;
 import com.matching.mentoree.service.dto.MissionDTO;
+import com.matching.mentoree.service.dto.ProgramDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
@@ -20,6 +21,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 import java.util.List;
 import java.util.NoSuchElementException;
 
@@ -80,7 +82,7 @@ public class ProgramController {
     }
 
     @GetMapping("/program/info/{programId}")
-    public String programInfoGet(@PathVariable("programId") long programId, Model model) {
+    public String programInfoGet(@PathVariable("programId") long programId, Model model, HttpServletRequest request) {
         ProgramInfoDTO programInfoDTO = programRepository.findProgramById(programId).orElseThrow(NoSuchElementException::new);
         model.addAttribute("program", programInfoDTO);
 
@@ -89,6 +91,13 @@ public class ProgramController {
         Participant host = participantRepository.findHost(programId).orElseThrow(NoSuchElementException::new);
         boolean isHost = loginEmail.equals(host.getMember().getEmail()) ? true : false;
         model.addAttribute("isHost", isHost);
+
+        HttpSession httpSession = request.getSession();
+        List<ProgramForNavbarDTO> participatedPrograms = (List<ProgramForNavbarDTO>) httpSession.getAttribute("participatedPrograms");
+        long count = participatedPrograms.stream().filter(p -> p.getId() == programId).count();
+        boolean isParticipated = count > 0 ? true : false;
+        model.addAttribute("isParticipated", isParticipated);
+
         return "programInfo";
     }
 

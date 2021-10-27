@@ -6,6 +6,8 @@ import com.matching.mentoree.repository.MemberRepository;
 import com.matching.mentoree.repository.ProgramRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.*;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -37,10 +39,14 @@ public class HomeController {
         Member login = memberRepository.findByEmail(email).orElseThrow(NoSuchElementException::new);
 
         // 나중에 페이징으로 쿼리 수정
-        List<ProgramInfoDTO> recommendPrograms = programRepository.findRecommendPrograms(login);
-        model.addAttribute("programRecommendList", recommendPrograms);
-        List<ProgramInfoDTO> allProgram = programRepository.findAllProgram();
-        model.addAttribute("programList", allProgram);
+        PageRequest recPageRq = PageRequest.of(0, 3);
+        Slice<ProgramInfoDTO> recommendPrograms = programRepository.findRecommendPrograms(login, recPageRq);
+        model.addAttribute("programRecommendList", recommendPrograms.getContent());
+
+        PageRequest allPageRq = PageRequest.of(0, 8);
+        Slice<ProgramInfoDTO> allProgram = programRepository.findAllProgram(login, allPageRq);
+
+        model.addAttribute("programList", allProgram.getContent());
 
         return "index";
     }

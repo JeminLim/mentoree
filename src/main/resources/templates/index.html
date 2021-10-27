@@ -19,9 +19,15 @@
                             </div>
                         </div>
                         <ol class="breadcrumb mb-4">
-                            <li class="breadcrumb-item active">추천 프로그램</li>
+                            <li class="breadcrumb-item active">
+                                <span style="margin-right: 5%">추천 프로그램 <a th:if="${not #lists.isEmpty(programRecommendList)}" id="viewMoreRecommendBtn" style="cursor:pointer;"><i class="fas fa-undo"></i></a></span>
+                            </li>
                         </ol>
-                        <div class="row">
+                        <div th:if="${#lists.isEmpty(programRecommendList)}" class="col-md-12 text-center">
+                            <span>개인정보 설정에서 관심분야를 설정해주세요</span>
+                        </div>
+                        <input id="recommendPage" type="hidden" value="0" />
+                        <div id="recommendArea" class="row">
                             <div class="col-xl-4 col-md-6" th:each="recommendProgram, index : ${programRecommendList}">
                                 <div class="card bg-white text-dark mb-4">
                                     <div class="card-header">
@@ -41,7 +47,7 @@
                                                 <tr>
                                                     <td width="20%">제목</td>
                                                     <td width="60%" th:text="${recommendProgram.title}">나는 프로그래머다</td>
-                                                    <td width="20%">IT</td>
+                                                    <td width="20%" th:text="${recommendProgram.category}">IT</td>
                                                 </tr>
                                                 <tr>
                                                     <td style="font:bold;" width="20%" colspan="1">멘토</td>
@@ -73,8 +79,9 @@
                         <ol class="breadcrumb mb-4">
                             <li class="breadcrumb-item active">프로그램 목록</li>
                         </ol>
+                        <input id="allProgramPage" type="hidden" value="0" />
                         <div class="row">
-                            <div class="col-xl-3" th:each="program, index : ${programList}">
+                            <div class="col-xl-3 programCard" th:each="program, index : ${programList}">
                                 <div class="card mb-4">
                                     <div class="card-header">
                                         <div class="d-flex">
@@ -126,7 +133,13 @@
                                     </div>
                                 </div>
                             </div>
-                        </div>                        
+                            <div id="moreProgramSpace"></div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12 text-center">
+                                <button id="viewMoreBtn" style="border-radius: 10%; ">&plus;더보기</button>
+                            </div>
+                        </div>
                     </div>
                 </main>
                 <footer class="py-4 bg-light mt-auto">
@@ -138,12 +151,12 @@
                 </footer>
             </div>
         </div>
-        <script src="js/scripts.js"></script>
+        <script th:src="@{/js/scripts.js}"></script>
+        <script th:src="@{/js/addProgram.js}"></script>
         <script>
             function moveToCreateProgram() {
                 document.location.href = "/program/registry";
             }
-
         </script>
     </body>
 </html>

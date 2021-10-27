@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
     <head th:replace="fragments/header :: header" />
-    <link th:href="@{css/profileStyle.css}" rel="stylesheet" />
+    <link th:href="@{/css/profileStyle.css}" rel="stylesheet" />
     <body class="sb-nav-fixed">
         <nav th:replace="fragments/nav :: nav" />
         <div id="layoutSidenav">
@@ -12,19 +12,10 @@
                 <main>
                     <div class="container-fluid">
                         <div class="row">
-                            <h2 class="header-pos" th:text="${profile.nickname} + ' 님의 프로필'">
-                                다른 아이디 님의 프로필
-                                <button th:if="${profile.isLogin}" class="btn btn-primary">프로필 편집</button>
+                            <h2 class="header-pos">
+                                <span th:text="${profile.nickname} + ' 님의 프로필'">다른 아이디 님의 프로필</span>
+                                <a th:if="${isLogin}" th:href="@{/member/profile/edit}" class="btn btn-primary">프로필 편집</a>
                             </h2>
-                            <div class="row d-flex">
-                                <aside class="leftSection col-md-2">
-                                    <label>프로필 사진</label>
-                                </aside>
-                                <div class="rightSection col-md-7">
-                                    <img th:src="${profile.imgUrl}" height="100">
-                                </div>
-                            </div>
-
                             <div class="row d-flex">
                                 <aside class="leftSection col-md-2">
                                     <label>이메일</label>
@@ -54,6 +45,17 @@
 
                             <div class="row d-flex">
                                 <aside class="leftSection col-md-2">
+                                    <label>관심분야</label>
+                                </aside>
+                                <div class="rightSection col-md-7">
+                                    <p class="infoInput" type="text" name="nickname" id="inputInterest1" th:text="'1, ' + ${profile.categories[0]}"> 관심분야1 </p>
+                                    <p class="infoInput" type="text" name="nickname" id="inputInterest2" th:text="'2, ' + ${profile.categories[1]}"> 관심분야2 </p>
+                                    <p class="infoInput" type="text" name="nickname" id="inputInterest3" th:text="'3, ' + ${profile.categories[2]}"> 관심분야3 </p>
+                                </div>
+                            </div>
+
+                            <div class="row d-flex">
+                                <aside class="leftSection col-md-2">
                                     <label>경력소개</label>
                                 </aside>
                                 <div class="rightSection col-md-7">
@@ -72,12 +74,6 @@
                 </footer>
             </div>
         </div>
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
-        <script src="js/scripts.js"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.min.js" crossorigin="anonymous"></script>
-        <script src="assets/demo/chart-area-demo.js"></script>
-        <script src="assets/demo/chart-bar-demo.js"></script>
-        <script src="https://cdn.jsdelivr.net/npm/simple-datatables@latest" crossorigin="anonymous"></script>
-        <script src="js/datatables-simple-demo.js"></script>
+        <script th:src="@{/js/scripts.js}"></script>
     </body>
 </html>

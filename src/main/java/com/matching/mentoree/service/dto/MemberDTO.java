@@ -51,21 +51,17 @@ public class MemberDTO {
         private String email;
         private String memberName;
         private String nickname;
-        private String imgUrl;
         private String link;
-        private List<Program> programList = new ArrayList<>();
-        private Boolean isLogin;
+        private List<String> categories = new ArrayList<>();
 
         @Builder
-        public MemberInfo(Long id, String email, String memberName, String nickname, String imgUrl, String link, List<Program> programList, Boolean isLogin) {
+        public MemberInfo(Long id, String email, String memberName, String nickname, String link, List<String> categories) {
             this.id = id;
             this.email = email;
             this.memberName = memberName;
             this.nickname = nickname;
-            this.imgUrl = imgUrl;
             this.link = link;
-            this.programList = programList;
-            this.isLogin = isLogin;
+            this.categories = categories;
         }
 
         public Member toEntity() {

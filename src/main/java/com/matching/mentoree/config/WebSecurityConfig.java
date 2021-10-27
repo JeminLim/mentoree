@@ -18,6 +18,9 @@ import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.logout.LogoutFilter;
 
+import static com.matching.mentoree.config.security.util.SecurityConstant.ACCESS_TOKEN;
+import static com.matching.mentoree.config.security.util.SecurityConstant.REFRESH_TOKEN;
+
 @EnableWebSecurity
 @RequiredArgsConstructor
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
@@ -67,7 +70,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .logoutSuccessUrl("/login")
                 .invalidateHttpSession(true)
                 .deleteCookies("JSESSIONID")
-                .deleteCookies("AccessToken");
+                .deleteCookies(ACCESS_TOKEN)
+                .deleteCookies(REFRESH_TOKEN);
 
         http
                 .addFilterAfter(new JwtFilter(cookieUtil, jwtUtils), LogoutFilter.class);

@@ -9,8 +9,11 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import javax.persistence.EntityManager;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
+import static com.matching.mentoree.domain.QCategory.*;
 import static com.matching.mentoree.domain.QMember.*;
+import static com.matching.mentoree.domain.QMemberInterest.*;
 import static com.matching.mentoree.domain.QParticipant.participant;
 import static com.matching.mentoree.domain.QProgram.program;
 
@@ -28,24 +31,20 @@ public class MemberCustomRepositoryImpl implements MemberCustomRepository{
                 member.email,
                 member.memberName,
                 member.nickname,
-                member.thumbnailImgUrl.as("imgUrl"),
                 member.link
-        ))
-                .from(member)
+                )).from(member)
                 .where(member.email.eq(email))
                 .fetchOne();
 
-        List<Program> participatedProgram = findParticipatedProgram(memberInfo.getId());
-        memberInfo.setProgramList(participatedProgram);
-        return Optional.of(memberInfo);
-    }
+        List<String> categories = queryFactory.select(memberInterest.category.categoryName)
+                .from(memberInterest)
+                .join(memberInterest.category, category)
+                .join(memberInterest.member, member)
+                .where(memberInterest.member.email.eq(email))
+                .fetch();
 
-    private List<Program> findParticipatedProgram(Long memberId) {
-        return queryFactory.select(participant.program)
-                .from(participant)
-                .join(participant.program, program)
-                .join(participant.member, member)
-                .where(participant.member.id.eq(memberId)).fetch();
+        if(categories != null) memberInfo.setCategories(categories);
+        return Optional.of(memberInfo);
     }
 
 

@@ -1,10 +1,15 @@
 package com.matching.mentoree.repository;
 
 import com.matching.mentoree.domain.*;
+import com.matching.mentoree.repository.util.RepositoryHelper;
+import com.querydsl.core.QueryResults;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 
 import javax.persistence.EntityManager;
 import java.util.ArrayList;
@@ -28,32 +33,9 @@ public class ProgramCustomRepositoryImpl implements ProgramCustomRepository{
     public ProgramCustomRepositoryImpl(EntityManager em) { this.queryFactory = new JPAQueryFactory(em);}
 
     @Override
-    public List<ProgramInfoDTO> findRecommendPrograms(Member login) {
-        List<ProgramInfoDTO> recommendPrograms = queryFactory.select(Projections.fields(ProgramInfoDTO.class,
-                program.programName.as("title"),
-                program.category.categoryName.as("category"),
-                program.maxMember,
-                program.goal,
-                program.description,
-                program.dueDate))
-                .from(program)
-                .join(program.category, category)
-                .join(program.participants, participant)
-                .where(program.category.in(
-                        JPAExpressions.select(memberInterest.category)
-                                .from(memberInterest)
-                                .where(memberInterest.member.eq(login))
-                )).fetch();
-
-        Map<Long, List<Participant>> mentorInProgram = findMentorInProgram(toProgramIds(recommendPrograms));
-        if(mentorInProgram != null)
-            recommendPrograms.forEach(o -> o.setMentor(mentorInProgram.get(o.getId())));
-        return recommendPrograms;
-    }
-
-    @Override
-    public List<ProgramInfoDTO> findAllProgram() {
-        List<ProgramInfoDTO> allPrograms = queryFactory.select(Projections.bean(ProgramInfoDTO.class,
+    public Slice<ProgramInfoDTO> findRecommendPrograms(Member login, Pageable pageable) {
+        List<Long> participatedProgramIds = findParticipatedProgramIds(login);
+        List<ProgramInfoDTO> queryResults = queryFactory.select(Projections.fields(ProgramInfoDTO.class,
                 program.id,
                 program.programName.as("title"),
                 program.category.categoryName.as("category"),
@@ -64,12 +46,47 @@ public class ProgramCustomRepositoryImpl implements ProgramCustomRepository{
                 .from(program)
                 .join(program.category, category)
                 .join(program.participants, participant)
+                .where( program.id.notIn(participatedProgramIds),
+                        program.category.in(JPAExpressions.select(memberInterest.category)
+                                                                .from(memberInterest)
+                                                                .where(memberInterest.member.eq(login)))
+                        ,program.isOpen.eq(true))
+                .limit(pageable.getPageSize() + 1)
+                .offset(pageable.getOffset())
+                .fetch();
+        Map<Long, List<Participant>> mentorInProgram = findMentorInProgram(toProgramIds(queryResults));
+        if(mentorInProgram != null)
+            queryResults.forEach(o -> o.setMentor(mentorInProgram.get(o.getId())));
+
+        Slice<ProgramInfoDTO> recommendPrograms = RepositoryHelper.toSlice(queryResults, pageable);
+        return recommendPrograms;
+    }
+
+    @Override
+    public Slice<ProgramInfoDTO> findAllProgram(Member login, Pageable pageable) {
+        List<Long> participatedProgramIds = findParticipatedProgramIds(login);
+        List<ProgramInfoDTO> result = queryFactory.select(Projections.bean(ProgramInfoDTO.class,
+                program.id,
+                program.programName.as("title"),
+                program.category.categoryName.as("category"),
+                program.maxMember,
+                program.goal,
+                program.description,
+                program.dueDate))
+                .from(program)
+                .join(program.category, category)
+                .join(program.participants, participant)
+                .where( program.id.notIn(participatedProgramIds),
+                        program.isOpen.eq(true))
+                .limit(pageable.getPageSize() + 1)
+                .offset(pageable.getOffset())
                 .fetch();
 
-        Map<Long, List<Participant>> mentorInProgram = findMentorInProgram(toProgramIds(allPrograms));
+        Map<Long, List<Participant>> mentorInProgram = findMentorInProgram(toProgramIds(result));
         if(mentorInProgram != null)
-            allPrograms.forEach(o -> o.setMentor(mentorInProgram.get(o.getId())));
+            result.forEach(o -> o.setMentor(mentorInProgram.get(o.getId())));
 
+        Slice<ProgramInfoDTO> allPrograms = RepositoryHelper.toSlice(result, pageable);
         return allPrograms;
     }
 
@@ -112,6 +129,14 @@ public class ProgramCustomRepositoryImpl implements ProgramCustomRepository{
                 .fetch();
 
         return participants.size() > 0 ? participants.stream().collect(Collectors.groupingBy(p -> p.getProgram().getId())) : null;
+    }
+
+    private List<Long> findParticipatedProgramIds(Member loginMember) {
+        return queryFactory.select(participant.program.id)
+                .from(participant)
+                .join(participant.program, program)
+                .where(participant.member.eq(loginMember))
+                .fetch();
     }
 
 }

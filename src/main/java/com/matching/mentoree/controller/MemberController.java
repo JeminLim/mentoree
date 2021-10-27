@@ -58,8 +58,8 @@ public class MemberController {
         String userEmail = (String) auth.getPrincipal();
 
         boolean isLogin = userEmail.equals(email) ? true : false;
-        findMember.setIsLogin(isLogin);
         model.addAttribute("profile", findMember);
+        model.addAttribute("isLogin", isLogin);
         return "profileBrowse";
     }
 

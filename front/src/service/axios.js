@@ -25,7 +25,6 @@ instance.interceptors.request.use(async function (config) {
 
         //setting for header
         config.headers['x-access-token'] = VueCookies.get('accessToken');
-        config.headers['x-refresh-token'] = VueCookies.get('refreshToken');
         config.headers['Content-Type'] = 'application/json; charset=UTF-8';
         return config;
 

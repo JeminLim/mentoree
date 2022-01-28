@@ -9,9 +9,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static com.mentoree.board.api.dto.BoardDTO.*;
-import static com.mentoree.domain.QBoard.*;
-import static com.mentoree.domain.QMember.*;
-import static com.mentoree.domain.QMission.*;
+
 
 public class BoardCustomRepositoryImpl implements BoardCustomRepository{
 

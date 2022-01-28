@@ -5,24 +5,19 @@ const token = {
     namespaced: true,
     state: {
         accessToken: '',
-        refreshToken: ''
     },
     mutations: {
         login(state, payload) {
-            VueCookies.set('accessToken', payload.accessToken, '30s');
-            VueCookies.set('refreshToken', payload.refreshToken, '168h');
+            VueCookies.set('accessToken', payload.accessToken, '1500s');
             state.accessToken = payload.accessToken;
-            state.refreshToken = payload.refreshToken;
         },
         reissueToken(state, payload) {
-            VueCookies.set('accessToken', payload, '30s');
+            VueCookies.set('accessToken', payload, '1500s');
             state.accessToken = payload;
         },
         removeToken(state) {
             VueCookies.remove('accessToken');
-            VueCookies.remove('refreshToken');
             state.accessToken = '';
-            state.refreshToken = '';
         }
     },
     actions: {
@@ -47,7 +42,6 @@ const token = {
        GET_TOKEN(state) {
            return {
                accessToken: state.accessToken,
-               refreshToken: state.refreshToken
            }
        }
     }

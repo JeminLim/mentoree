@@ -8,9 +8,6 @@ import javax.persistence.EntityManager;
 import java.util.List;
 import java.util.Optional;
 
-import static com.mentoree.domain.QCategory.*;
-import static com.mentoree.domain.QMember.*;
-import static com.mentoree.domain.QMemberInterest.*;
 import static com.mentoree.member.api.dto.MemberDTO.*;
 
 public class MemberCustomRepositoryImpl implements MemberCustomRepository{

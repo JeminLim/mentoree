@@ -1,13 +1,12 @@
 package com.mentoree.service;
 
 import com.mentoree.category.domain.Category;
-import com.mentoree.mission.api.dto.MissionDTO;
+import com.mentoree.mission.api.dto.MissionDTOCollection;
 import com.mentoree.mission.domain.Mission;
 import com.mentoree.mission.repository.MissionRepository;
 import com.mentoree.mission.service.MissionService;
 import com.mentoree.program.domain.Program;
 import com.mentoree.program.repository.ProgramRepository;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -18,7 +17,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.time.LocalDate;
 import java.util.Optional;
 
-import static com.mentoree.mission.api.dto.MissionDTO.*;
+import static com.mentoree.mission.api.dto.MissionDTOCollection.*;
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
@@ -59,7 +58,7 @@ public class MissionServiceTest {
         Program program = createProgram();
         Mission mission = createMission(program);
         when(missionRepository.findById(any())).thenReturn(Optional.of(mission));
-        MissionDTO updateForm = builder()
+        MissionDTO updateForm = MissionDTO.builder()
                 .id(1L)
                 .title("changeTitle")
                 .content("changeContent")

@@ -9,6 +9,9 @@ import java.util.List;
 import java.util.Optional;
 
 import static com.mentoree.member.api.dto.MemberDTO.*;
+import static com.mentoree.member.domain.QMember.*;
+import static com.mentoree.member.domain.QMemberInterest.*;
+import static com.mentoree.category.domain.QCategory.*;
 
 public class MemberCustomRepositoryImpl implements MemberCustomRepository{
 

@@ -27,8 +27,16 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     private final CustomUserDetailService customUserDetailService;
     private final JwtUtils jwtUtils;
-    private final TokenRepository tokenRepository;
-    private final ParticipantRepository participantRepository;
+    private static final String[] NO_AUTH_PATH = {
+            "/api/login",
+            "/api/join/**",
+            "/api/reissue",
+            "/swagger-ui.html/**",
+            "/swagger-resources/**",
+            "/v2/api-docs",
+            "/webjars/**"
+    };
+
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -55,7 +63,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                 .csrf().disable()
                 .authorizeRequests()
-                .antMatchers("/api/login", "/api/join/**", "/api/reissue").permitAll()
+                .antMatchers(NO_AUTH_PATH).permitAll()
                 .anyRequest().authenticated();
 
         http
@@ -95,6 +103,5 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         auth.authenticationProvider(new CustomAuthenticationProvider(passwordEncoder(), customUserDetailService));
         auth.userDetailsService(customUserDetailService).passwordEncoder(passwordEncoder());
     }
-
 
 }

@@ -1,6 +1,5 @@
 package com.mentoree.mission.repository;
 
-import com.mentoree.mission.api.dto.MissionDTO;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
@@ -9,8 +8,9 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
-import static com.mentoree.domain.QMission.*;
-import static com.mentoree.domain.QProgram.*;
+import static com.mentoree.mission.api.dto.MissionDTOCollection.*;
+import static com.mentoree.mission.domain.QMission.*;
+import static com.mentoree.program.domain.QProgram.*;
 
 public class MissionCustomRepositoryImpl implements MissionCustomRepository{
 

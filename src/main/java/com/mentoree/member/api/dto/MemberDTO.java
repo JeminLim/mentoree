@@ -2,9 +2,15 @@ package com.mentoree.member.api.dto;
 
 import com.mentoree.member.domain.Member;
 import com.mentoree.global.domain.UserRole;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.*;
+import org.hibernate.validator.constraints.Range;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Pattern;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,23 +21,37 @@ public class MemberDTO {
     @Getter
     @Setter
     @NoArgsConstructor
-    @ToString(of = {"email", "password", "memberName", "nickname"})
-    public static class RegistrationRequest {
+    @ApiModel(description = "회원가입 요청 폼")
+    public static class MemberRegistRequest {
 
+        @NotBlank
+        @Email
+        @ApiModelProperty(value = "이메일")
         private String email;
+
+        @NotBlank
+        @Range(min = 8, max = 16)
+        @Pattern(regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[$@$!%*?&#%])[A-Za-z\\d$@$!%*?&]{8,16}")
+        @ApiModelProperty(value = "비밀번호", notes = "최소 8자 이상 최대 16자 이하, 최소 하나 이상의 대,소문자, 숫자, 특수문자 요구")
         private String password;
+
+        @NotBlank
+        @ApiModelProperty(value = "회원 이름")
         private String memberName;
+
+        @NotBlank
+        @Range(min = 2, max = 15)
+        @ApiModelProperty(value = "회원 이름", notes = "최소 2자 이상 최대 15이하")
         private String nickname;
 
         @Builder
-        public RegistrationRequest(String email, String password, String memberName, String nickname) {
+        public MemberRegistRequest(String email, String password, String memberName, String nickname) {
             this.email = email;
             this.password = password;
             this.memberName = memberName;
             this.nickname = nickname;
         }
 
-        // Entity 가 가지는 의존성 보다 dto 가 가지는 의존성을 지니는 것이 좋...을까?
         public Member toEntity(PasswordEncoder encoder, UserRole role) {
             return Member.builder()
                     .email(this.email)
@@ -46,12 +66,28 @@ public class MemberDTO {
     @Getter
     @Setter
     @NoArgsConstructor
+    @ApiModel(description = "회원 정보")
     public static class MemberInfo {
+
+        @NotBlank
+        @ApiModelProperty(value = "회원 이메일")
         private String email;
+
+        @NotBlank
+        @ApiModelProperty(value = "회원 이름")
         private String memberName;
+
+        @NotBlank
+        @ApiModelProperty(value = "회원 닉네임")
         private String nickname;
+
+        @ApiModelProperty(value = "회원 관심분야 리스트")
         private List<String> interests = new ArrayList<>();
+
+        @ApiModelProperty(value = "회원 경력 상세")
         private String link;
+
+        @ApiModelProperty(value = "회원 참가 프로그램 리스트")
         private List<ParticipatedProgramDTO> participatedPrograms = new ArrayList<>();
 
         @Builder

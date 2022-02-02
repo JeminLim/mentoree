@@ -1,7 +1,7 @@
 package com.mentoree.program.api;
 
 import com.mentoree.member.domain.Member;
-import com.mentoree.participants.api.dto.ParticipantDTO.ApplyRequest;
+import com.mentoree.participants.api.dto.ParticipantDTOCollection.ApplyRequest;
 import com.mentoree.participants.domain.Participant;
 import com.mentoree.program.domain.Program;
 import com.mentoree.program.domain.ProgramRole;
@@ -9,8 +9,9 @@ import com.mentoree.member.repository.MemberRepository;
 import com.mentoree.participants.repository.ParticipantRepository;
 import com.mentoree.program.repository.ProgramRepository;
 import com.mentoree.program.service.ProgramService;
-import com.mentoree.participants.api.dto.ParticipantDTO;
-import com.mentoree.program.api.dto.ProgramRequestDTO;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
@@ -18,6 +19,8 @@ import org.springframework.data.domain.Slice;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -32,7 +35,8 @@ import static com.mentoree.program.api.dto.ProgramRequestDTO.*;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api")
+@RequestMapping("/api/programs")
+@Api("Program Controller API")
 public class ProgramAPIController {
 
     private final ProgramRepository programRepository;
@@ -41,8 +45,9 @@ public class ProgramAPIController {
     private final ParticipantRepository participantRepository;
 
     //== 프로그램 생성 ==//
-    @PostMapping("/program/create")
-    public ResponseEntity createProgram(@RequestBody ProgramCreateDTO createForm) {
+    @ApiOperation(value = "프로그램 생성 요청", notes = "프로그램 생성 요청 후, 프로그램 개설자 참가 정보 갱신 반환")
+    @PostMapping("/new")
+    public ResponseEntity createProgram(@ApiParam(value = "생성 요청 폼", required = true) @Validated @RequestBody ProgramCreateDTO createForm, BindingResult bindingResult) {
         log.info("program registry .....");
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         String email = (String) auth.getPrincipal();
@@ -58,8 +63,9 @@ public class ProgramAPIController {
 
 
     //== 프로그램 리스트 ==//
-    @PostMapping("/program/list")
-    public ResponseEntity getMoreList(@RequestBody ProgramRequest data) {
+    @ApiOperation(value = "프로그램 리스트 요청", notes = "참가 할 수 있는 프로그램 전체 중 해당 페이지 프로그램 반환")
+    @PostMapping("/list")
+    public ResponseEntity getMoreList(@ApiParam(value = "프로그램 리스트 페이지 요청 폼", required = true) @Validated @RequestBody ProgramRequest data, BindingResult bindingResult) {
         int page = data.getPage();
         List<ParticipatedProgramDTO> programs = data.getParticipatedPrograms();
         PageRequest pageRequest = PageRequest.of(page, 8);
@@ -73,8 +79,9 @@ public class ProgramAPIController {
         return ResponseEntity.ok().body(result);
     }
 
-    @PostMapping("/program/recommend/list")
-    public ResponseEntity getMoreRecommendList(@RequestBody RecommendProgramRequest data) {
+    @ApiOperation(value = "추천 프로그램 리스트 요청", notes = "관심분야와 일치하는 참가 가능한 리스트 중 해당 페이지 프로그램 반환")
+    @PostMapping("/list/recommend")
+    public ResponseEntity getMoreRecommendList(@ApiParam(value = "추천 프로그램 리스트 페이지 요청", required = true) @Validated @RequestBody RecommendProgramRequest data, BindingResult bindingResult) {
 
         int page = data.getPage();
         List<ParticipatedProgramDTO> programs = data.getParticipatedPrograms();
@@ -91,8 +98,9 @@ public class ProgramAPIController {
     }
 
     //== 프로그램 상세 정보 ==//
-    @GetMapping("/program/{programId}/info")
-    public ResponseEntity programInfoGet(@PathVariable("programId") long programId) {
+    @ApiOperation(value = "프로그램 상세 정보 열람", notes = "요청 프로그램 상세 정보 반환")
+    @GetMapping("/{programId}")
+    public ResponseEntity programInfoGet(@ApiParam(value = "요청 프로그램 Id", required = true) @PathVariable("programId") long programId) {
         ProgramInfoDTO programInfoDTO = programRepository.findProgramById(programId).orElseThrow(NoSuchElementException::new);
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         String loginEmail = (String) auth.getPrincipal();
@@ -107,8 +115,9 @@ public class ProgramAPIController {
     }
 
     //== 프로그램 참가 신청 ==//
-    @PostMapping("/program/{programId}/join")
-    public ResponseEntity applyProgram(@RequestBody ApplyRequest applyRequest) {
+    @ApiOperation(value = "프로그램 참가 신청", notes = "프로그램 참가 신청 결과 반환")
+    @PostMapping("/{programId}/join")
+    public ResponseEntity applyProgram(@ApiParam(value = "참가 신청 폼", required = true) @Validated @RequestBody ApplyRequest applyRequest, BindingResult bindingResult) {
 
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         String email = (String) auth.getPrincipal();
@@ -132,8 +141,9 @@ public class ProgramAPIController {
 
 
     //== 프로그램 참가자 관리 ==//
-    @GetMapping("/program/{programId}/applicants")
-    public ResponseEntity programApplicationListGet(@PathVariable("programId") long programId) {
+    @ApiOperation(value = "프로그램 참가 신청자 리스트 요청", notes = "프로그램 정보 및 참가 신청자 리스트 반환")
+    @GetMapping("/{programId}/applicants")
+    public ResponseEntity programApplicationListGet(@ApiParam(value = "관리 프로그램 ID", required = true) @PathVariable("programId") long programId) {
         ProgramInfoDTO programInfoDTO = programRepository.findProgramById(programId).orElseThrow(NoSuchElementException::new);
         List<ApplyRequest> allApplicants = participantRepository.findAllApplicants(programId);
         Long currentNumMember = participantRepository.countCurrentMember(programId);
@@ -146,8 +156,10 @@ public class ProgramAPIController {
     }
 
     //== 프로그램 참가 승인 ==//
-    @PostMapping("/program/{programId}/applicants/accept")
-    public ResponseEntity applicant(@RequestParam("memberId") long memberId, @PathVariable("programId") Long programId) {
+    @ApiOperation(value = "프로그램 참가 승인 요청", notes = "프로그램 참가 승인 결과 반환")
+    @PostMapping("/{programId}/applicants/accept")
+    public ResponseEntity applicant(@ApiParam(value = "승인 대상자 ID", required = true) @RequestParam("memberId") long memberId,
+                                    @ApiParam(value = "관리 프로그램 ID", required = true) @PathVariable("programId") Long programId) {
         programService.approval(memberId, programId);
 
         Map<String, String> result = new HashMap<>();
@@ -157,8 +169,10 @@ public class ProgramAPIController {
     }
 
     //== 프로그램 참가 거절 ==//
-    @PostMapping("/program/{programId}/applicants/reject")
-    public ResponseEntity applicantReject(@RequestParam("memberId") Long memberId, @PathVariable("programId") Long programId) {
+    @ApiOperation(value = "프로그램 참가 거절 요청", notes = "프로그램 참가 거절 결과 반환")
+    @PostMapping("/{programId}/applicants/reject")
+    public ResponseEntity applicantReject(@ApiParam(value = "거절 대상자 ID", required = true) @RequestParam("memberId") Long memberId,
+                                          @ApiParam(value = "관리 프로그램 ID", required = true) @PathVariable("programId") Long programId) {
         programService.reject(memberId, programId);
 
         Map<String, String> result = new HashMap<>();

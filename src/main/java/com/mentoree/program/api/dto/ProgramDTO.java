@@ -1,15 +1,22 @@
 package com.mentoree.program.api.dto;
 
 import com.mentoree.category.domain.Category;
-import com.mentoree.mission.api.dto.MissionDTO;
-import com.mentoree.participants.api.dto.ParticipantDTO;
+import com.mentoree.mission.api.dto.MissionDTOCollection;
+import com.mentoree.participants.api.dto.ParticipantDTOCollection;
 import com.mentoree.program.domain.Program;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.*;
+import org.hibernate.validator.constraints.Range;
 import org.springframework.format.annotation.DateTimeFormat;
 
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.mentoree.participants.api.dto.ParticipantDTOCollection.*;
 
 
 public class ProgramDTO {
@@ -18,16 +25,40 @@ public class ProgramDTO {
     @Setter
     @NoArgsConstructor
     @ToString
+    @ApiModel(description = "프로그램 생성 요청 폼")
     public static class ProgramCreateDTO {
 
+        @NotBlank
+        @ApiModelProperty(value = "프로그램 제목")
         private String programName;
+
+        @Range(min = 2, max = 10)
+        @ApiModelProperty(value = "프로그램 모집 인원")
         private Integer targetNumber;
+
+        @NotNull
+        @ApiModelProperty(value = "프로그램 목표")
         private String goal;
+
+        @NotNull
+        @ApiModelProperty(value = "프로그램 설명")
         private String description;
+
+        @NotNull
+        @ApiModelProperty(value = "프로그램 분류")
         private String category;
+
+        @NotNull
+        @ApiModelProperty(value = "멘토 역할 참가 여부")
         private Boolean mentor;
+
+
         @DateTimeFormat(pattern = "yyyy-MM-dd")
+        @NotNull
+        @ApiModelProperty(value = "프로그램 모집 기한")
         private LocalDate dueDate;
+
+        @ApiModelProperty(hidden = true)
         private String programRole; // 멘토여부에 따라서 멘토 아니면 전부 멘티
 
         @Builder
@@ -58,32 +89,39 @@ public class ProgramDTO {
     @Getter
     @Setter
     @NoArgsConstructor
-    public static class ProgramJoinDTO {
-        private String email;
-        private String msg;
-        private String role;
-
-        @Builder
-        public ProgramJoinDTO(String email, String msg, String role) {
-            this.email = email;
-            this.msg = msg;
-            this.role = role;
-        }
-    }
-
-    @Getter
-    @Setter
-    @NoArgsConstructor
     @ToString(exclude = "mentor")
+    @ApiModel(description = "프로그램 정보")
     public static class ProgramInfoDTO {
 
+        @NotNull
+        @ApiModelProperty(value = "프로그램 id")
         private Long id;
+
+        @NotNull
+        @ApiModelProperty(value = "프로그램 제목")
         private String title;
+
+        @NotNull
+        @ApiModelProperty(value = "프로그램 분류")
         private String category;
+
+        @NotNull
+        @ApiModelProperty(value = "프로그램 모집 인원")
         private int maxMember;
+
+        @ApiModelProperty(value = "프로그램 참가 멘토 리스트")
         private List<ParticipantDTO> mentor = new ArrayList<>();
+
+        @NotNull
+        @ApiModelProperty(value = "프로그램 목표")
         private String goal;
+
+        @NotNull
+        @ApiModelProperty(value = "프로그램 설명")
         private String description;
+
+        @NotNull
+        @ApiModelProperty(value = "프로그램 모집기한")
         @DateTimeFormat(pattern = "yyyy-MM-dd")
         private LocalDate dueDate;
 
@@ -103,28 +141,15 @@ public class ProgramDTO {
     @Getter
     @Setter
     @NoArgsConstructor
-    public static class ProgramBrowseDTO {
-
-        private String title;
-        private Long programId;
-        private List<MissionDTO> curMission = new ArrayList<>();
-        private List<MissionDTO> endMission = new ArrayList<>();
-
-        @Builder
-        public ProgramBrowseDTO(String title, Long programId, List<MissionDTO> curMission, List<MissionDTO> endMission) {
-            this.title = title;
-            this.programId = programId;
-            this.curMission = curMission;
-            this.endMission = endMission;
-        }
-    }
-
-    @Getter
-    @Setter
-    @NoArgsConstructor
+    @ApiModel(description = "참가 프로그램 간략 정보")
     public static class ParticipatedProgramDTO {
 
+        @NotNull
+        @ApiModelProperty(value = "프로그램 Id")
         private Long id;
+
+        @NotNull
+        @ApiModelProperty(value = "프로그램 제목")
         private String title;
 
         @Builder

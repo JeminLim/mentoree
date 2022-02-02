@@ -4,14 +4,12 @@ import com.mentoree.category.domain.Category;
 import com.mentoree.category.repository.CategoryRepository;
 import com.mentoree.member.domain.Member;
 import com.mentoree.member.repository.MemberRepository;
-import com.mentoree.participants.api.dto.ParticipantDTO;
 import com.mentoree.participants.domain.Participant;
 import com.mentoree.participants.repository.ParticipantRepository;
 import com.mentoree.program.api.dto.ProgramDTO;
 import com.mentoree.program.domain.Program;
 import com.mentoree.program.domain.ProgramRole;
 import com.mentoree.program.repository.ProgramRepository;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -23,10 +21,9 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.Optional;
 
-import static com.mentoree.participants.api.dto.ParticipantDTO.*;
+import static com.mentoree.participants.api.dto.ParticipantDTOCollection.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @ExtendWith(SpringExtension.class)

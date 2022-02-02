@@ -6,6 +6,8 @@ import com.mentoree.member.repository.MemberRepository;
 import com.mentoree.participants.repository.ParticipantRepository;
 import com.mentoree.global.repository.TokenRepository;
 import com.mentoree.member.api.dto.MemberDTO;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.*;
@@ -26,6 +28,7 @@ import static com.mentoree.program.api.dto.ProgramDTO.*;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api")
+@Api("Member Login Controller API")
 public class MemberLoginAPIController {
 
     private final JwtUtils jwtUtils;
@@ -34,6 +37,7 @@ public class MemberLoginAPIController {
     private final TokenRepository tokenRepository;
 
     //== 로그인 ==//
+    @ApiOperation(value = "회원 로그인 성공 후 로직", hidden = true)
     @PostMapping("/login/success")
     public ResponseEntity loginSuccess() {
         log.info("login success ... " );
@@ -66,12 +70,14 @@ public class MemberLoginAPIController {
         return ResponseEntity.ok().body(data);
     }
 
+    @ApiOperation(value = "회원 로그인 실패 후 로직", hidden = true)
     @PostMapping("/login/fail")
     public ResponseEntity loginFail() {
         throw new BadCredentialsException("아이디 또는 비밀번호 오류");
     }
 
     //== 토큰 재발급 ==//
+    @ApiOperation(value = "액세스 토큰 재발급", notes = "토큰 검증 후, 재발급 액세스 토큰 반환")
     @PostMapping("/reissue")
     public ResponseEntity publishRefreshToken(@RequestBody Map<String, String> token) {
         String refreshToken = token.get("refreshToken");

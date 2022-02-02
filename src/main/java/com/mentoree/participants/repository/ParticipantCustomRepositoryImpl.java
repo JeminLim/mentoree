@@ -1,11 +1,7 @@
 package com.mentoree.participants.repository;
 
 
-import com.mentoree.domain.*;
-import com.mentoree.participants.api.dto.ParticipantDTO;
-import com.mentoree.member.domain.Member;
 import com.mentoree.participants.domain.Participant;
-import com.mentoree.program.domain.ProgramRole;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
@@ -14,10 +10,10 @@ import javax.persistence.EntityManager;
 import java.util.List;
 import java.util.Optional;
 
-import static com.mentoree.domain.QMember.*;
-import static com.mentoree.domain.QParticipant.*;
-import static com.mentoree.domain.QProgram.*;
-import static com.mentoree.participants.api.dto.ParticipantDTO.*;
+import static com.mentoree.member.domain.QMember.*;
+import static com.mentoree.participants.domain.QParticipant.*;
+import static com.mentoree.program.domain.QProgram.*;
+import static com.mentoree.participants.api.dto.ParticipantDTOCollection.*;
 import static com.mentoree.program.api.dto.ProgramDTO.*;
 
 public class ParticipantCustomRepositoryImpl implements ParticipantCustomRepository{
@@ -92,11 +88,11 @@ public class ParticipantCustomRepositoryImpl implements ParticipantCustomReposit
 
     @Override
     public Boolean isApplicants(Long programId, Long memberId) {
-        Participant applicant = queryFactory.selectFrom(QParticipant.participant)
-                .from(QParticipant.participant)
-                .where(QParticipant.participant.program.id.eq(programId),
-                        QParticipant.participant.member.id.eq(memberId),
-                        QParticipant.participant.approval.eq(false))
+        Participant applicant = queryFactory.selectFrom(participant)
+                .from(participant)
+                .where(participant.program.id.eq(programId),
+                        participant.member.id.eq(memberId),
+                        participant.approval.eq(false))
                 .fetchOne();
         return applicant != null;
     }

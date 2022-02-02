@@ -1,4 +1,4 @@
-package com.mentoree.global.exception;
+package com.mentoree.global.advice.response;
 
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -25,12 +25,27 @@ public class ErrorResponse {
         this.errors = errors;
     }
 
+    private ErrorResponse(final ErrorCode code, final List<FieldError> errors, String message) {
+        this.message = message;
+        this.status = code.getStatus();
+        this.code = code.getCode();
+        this.errors = errors;
+    }
+
     private ErrorResponse(final ErrorCode code) {
         this.message = code.getMessage();
         this.status = code.getStatus();
         this.code = code.getCode();
         this.errors = new ArrayList<>();
     }
+
+    private ErrorResponse(final ErrorCode code, String message) {
+        this.message = message;
+        this.status = code.getStatus();
+        this.code = code.getCode();
+        this.errors = new ArrayList<>();
+    }
+
 
     public static ErrorResponse of(final ErrorCode code, final BindingResult bindingResult) {
         return new ErrorResponse(code, FieldError.of(bindingResult));

@@ -4,12 +4,13 @@ import com.mentoree.mission.domain.Mission;
 import com.mentoree.program.domain.Program;
 import com.mentoree.mission.repository.MissionRepository;
 import com.mentoree.program.repository.ProgramRepository;
-import com.mentoree.mission.api.dto.MissionDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.NoSuchElementException;
+
+import static com.mentoree.mission.api.dto.MissionDTOCollection.*;
 
 @Service
 @RequiredArgsConstructor
@@ -19,7 +20,7 @@ public class MissionService {
     private final ProgramRepository programRepository;
 
     @Transactional
-    public void createMission(MissionDTO.MissionCreateRequest missionDTO) {
+    public void createMission(MissionCreateRequest missionDTO) {
         Program program = programRepository.findById(missionDTO.getProgramId()).orElseThrow(NoSuchElementException::new);
         missionRepository.save(missionDTO.toEntity(program));
     }

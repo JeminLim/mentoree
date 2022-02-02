@@ -1,13 +1,12 @@
 package com.mentoree.api;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.mentoree.board.api.dto.BoardDTO;
 import com.mentoree.board.repository.BoardRepository;
 import com.mentoree.config.WebConfig;
 import com.mentoree.config.WebSecurityConfig;
 import com.mentoree.config.security.JwtFilter;
 import com.mentoree.mission.api.MissionAPIController;
-import com.mentoree.mission.api.dto.MissionDTO;
+import com.mentoree.mission.api.dto.MissionDTOCollection;
 import com.mentoree.mission.repository.MissionRepository;
 import com.mentoree.mission.service.MissionService;
 import org.junit.jupiter.api.BeforeEach;
@@ -32,7 +31,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static com.mentoree.board.api.dto.BoardDTO.*;
-import static com.mentoree.mission.api.dto.MissionDTO.*;
+import static com.mentoree.mission.api.dto.MissionDTOCollection.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -66,8 +65,8 @@ public class MissionControllerTest {
 
     @BeforeEach
     void setUp() {
-        missionDTO = builder().goal("testGoal").dueDate(LocalDate.now()).content("content").id(1L).title("missionTitle").build();
-        MissionDTO missionDTO2 = builder().goal("testGoal2").dueDate(LocalDate.now()).content("content2").id(2L).title("missionTitle2").build();
+        missionDTO = MissionDTO.builder().goal("testGoal").dueDate(LocalDate.now()).content("content").id(1L).title("missionTitle").build();
+        MissionDTO missionDTO2 = MissionDTO.builder().goal("testGoal2").dueDate(LocalDate.now()).content("content2").id(2L).title("missionTitle2").build();
         missionDTOList.add(missionDTO);
         missionDTOList.add(missionDTO2);
     }

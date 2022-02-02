@@ -26,8 +26,8 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class JwtUtils {
 
-//    @Value("${spring.jwt.secret}")
-    private final String SECRET_KEY = "secretKeyAuthorizationJwtTokenForMentoreeSecretKey";
+    @Value("${spring.jwt.secret}")
+    private final String SECRET_KEY;
 
     private final Long ACCESS_VALIDATION_TIME = 60 * 15 * 1000L; // 15분
     private final Long REFRESH_VALIDATION_TIME = 60 * 60 * 24 * 15 * 1000L; // 15일

@@ -1,4 +1,4 @@
-package com.mentoree.global.exception;
+package com.mentoree.global.advice.response;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Getter;
@@ -7,7 +7,8 @@ import lombok.Getter;
 @JsonFormat(shape = JsonFormat.Shape.OBJECT)
 public enum ErrorCode {
 
-    BAD_CREDENTIALS(401, "C001", " Bad Credentials")
+    BAD_CREDENTIALS(401, "C001", " Bad Credentials"),
+
 
     ;
 

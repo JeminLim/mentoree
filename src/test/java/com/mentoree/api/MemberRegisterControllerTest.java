@@ -53,7 +53,7 @@ public class MemberRegisterControllerTest {
     @DisplayName("회원가입 요청 테스트 성공 컨트롤러 테스트")
     public void joinMemberTest() throws Exception {
         //given
-        RegistrationRequest regForm = RegistrationRequest.builder()
+        MemberRegistRequest regForm = MemberRegistRequest.builder()
                 .email("test@email.com")
                 .memberName("tester")
                 .nickname("testNick")

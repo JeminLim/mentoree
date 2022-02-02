@@ -1,8 +1,6 @@
 package com.mentoree.program.repository;
 
 import com.mentoree.global.repository.util.RepositoryHelper;
-import com.mentoree.participants.api.dto.ParticipantDTO;
-import com.mentoree.member.domain.Member;
 import com.mentoree.program.domain.ProgramRole;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -17,10 +15,11 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static com.mentoree.domain.QCategory.*;
-import static com.mentoree.domain.QMember.*;
-import static com.mentoree.domain.QParticipant.*;
-import static com.mentoree.domain.QProgram.*;
+import static com.mentoree.category.domain.QCategory.*;
+import static com.mentoree.member.domain.QMember.*;
+import static com.mentoree.participants.api.dto.ParticipantDTOCollection.*;
+import static com.mentoree.participants.domain.QParticipant.*;
+import static com.mentoree.program.domain.QProgram.*;
 import static com.mentoree.program.api.dto.ProgramDTO.*;
 
 @Slf4j

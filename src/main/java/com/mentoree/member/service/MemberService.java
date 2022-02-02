@@ -1,10 +1,8 @@
 package com.mentoree.member.service;
 
 import com.mentoree.category.repository.CategoryRepository;
-import com.mentoree.member.api.dto.MemberDTO.RegistrationRequest;
 import com.mentoree.member.repository.MemberInterestRepository;
 import com.mentoree.member.repository.MemberRepository;
-import com.mentoree.member.api.dto.MemberDTO;
 import com.mentoree.category.domain.Category;
 import com.mentoree.member.domain.Member;
 import com.mentoree.member.domain.MemberInterest;
@@ -31,7 +29,7 @@ public class MemberService {
 
     //== 회원가입 ==//
     @Transactional
-    public Member join(RegistrationRequest request) {
+    public Member join(MemberRegistRequest request) {
         return memberRepository.save(request.toEntity(passwordEncoder, UserRole.USER));
     }
 

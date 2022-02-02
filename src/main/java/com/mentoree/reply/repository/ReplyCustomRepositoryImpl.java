@@ -7,9 +7,9 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import javax.persistence.EntityManager;
 import java.util.List;
 
-import static com.mentoree.domain.QBoard.*;
-import static com.mentoree.domain.QMember.*;
-import static com.mentoree.domain.QReply.*;
+import static com.mentoree.board.domain.QBoard.*;
+import static com.mentoree.member.domain.QMember.*;
+import static com.mentoree.reply.domain.QReply.*;
 
 public class ReplyCustomRepositoryImpl implements ReplyCustomRepository{
 

@@ -1,7 +1,7 @@
 package com.mentoree.global.advice;
 
-import com.mentoree.global.exception.ErrorCode;
-import com.mentoree.global.exception.ErrorResponse;
+import com.mentoree.global.advice.response.ErrorCode;
+import com.mentoree.global.advice.response.ErrorResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

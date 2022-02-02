@@ -4,7 +4,6 @@ import com.mentoree.category.domain.Category;
 import com.mentoree.category.repository.CategoryRepository;
 import com.mentoree.global.domain.UserRole;
 import com.mentoree.member.api.dto.MemberDTO.MemberInfo;
-import com.mentoree.member.api.dto.MemberDTO.RegistrationRequest;
 import com.mentoree.member.domain.Member;
 import com.mentoree.member.domain.MemberInterest;
 import com.mentoree.member.repository.MemberInterestRepository;
@@ -22,6 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import static com.mentoree.member.api.dto.MemberDTO.*;
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
@@ -45,7 +45,7 @@ public class MemberServiceTest {
     @DisplayName("회원가입 테스트")
     public void join() throws Exception {
         //given
-        RegistrationRequest regForm = RegistrationRequest.builder()
+        MemberRegistRequest regForm = MemberRegistRequest.builder()
                 .email("test@email.com")
                 .password("1234")
                 .memberName("tester")

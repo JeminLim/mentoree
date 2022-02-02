@@ -1,12 +1,11 @@
 package com.mentoree.repository;
 
 
-import com.mentoree.mission.api.dto.MissionDTO;
+import com.mentoree.mission.api.dto.MissionDTOCollection;
 import com.mentoree.mission.domain.Mission;
 import com.mentoree.mission.repository.MissionRepository;
 import com.mentoree.program.domain.Program;
 import com.mentoree.program.repository.ProgramRepository;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -20,6 +19,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.NoSuchElementException;
 
+import static com.mentoree.mission.api.dto.MissionDTOCollection.*;
 import static org.assertj.core.api.Assertions.*;
 
 @ExtendWith(SpringExtension.class)

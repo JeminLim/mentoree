@@ -19,12 +19,14 @@ public class RefreshToken extends BaseTimeEntity {
     private Long id;
 
     private String email;
-    private String refreshToken;
+    private String uuid;
+    private String accessToken;
 
     @Builder
-    public RefreshToken(String email, String refreshToken) {
+    public RefreshToken(String email, String uuid, String accessToken) {
         this.email = email;
-        this.refreshToken = refreshToken;
+        this.uuid = uuid;
+        this.accessToken = accessToken;
     }
 
 }

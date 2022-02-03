@@ -10,14 +10,13 @@ import org.springframework.test.context.ActiveProfiles;
 import javax.inject.Inject;
 
 @ActiveProfiles("test")
-@Import(AESUtils.class)
 public class AESUtilsTest {
 
     @Test
     @DisplayName("AES encrypt test")
     public void AESEncryptTest() throws Exception {
 
-        AESUtils aesUtils = new AESUtils("12345678901234567890123456789012");
+        AESUtils aesUtils = new AESUtils();
 
         //given
         String msg = "test message";

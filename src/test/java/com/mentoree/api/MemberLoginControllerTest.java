@@ -77,7 +77,7 @@ public class MemberLoginControllerTest {
     public void loginSuccess() throws Exception {
         //given
         MemberInfo user = MemberInfo.builder().email("test@email.com").memberName("tester").nickname("testNick").build();
-        when(jwtUtils.generateAccessToken(any())).thenReturn("accessToken");
+        when(jwtUtils.generateAccessToken(any(), any(), any())).thenReturn("accessToken");
         when(jwtUtils.generateRefreshToken(any())).thenReturn("refreshToken");
         when(memberRepository.findMemberInfoByEmail(any())).thenReturn(Optional.of(user));
         when(participantRepository.findParticipateProgram(any())).thenReturn(new ArrayList<>());

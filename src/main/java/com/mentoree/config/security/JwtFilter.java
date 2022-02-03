@@ -11,6 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
+import org.springframework.util.AntPathMatcher;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import javax.servlet.FilterChain;
@@ -25,15 +26,36 @@ import java.io.IOException;
 public class JwtFilter extends OncePerRequestFilter {
 
     private final JwtUtils jwtUtils;
+    private String[] excludePath;
+
+    public void excludePath(String ... path) {
+        this.excludePath = path;
+    }
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         try {
-            String accessToken = request.getHeader("x-access-token");
-            if(jwtUtils.isValidToken(accessToken)) {
-                Authentication authentication = jwtUtils.getAuthentication(accessToken);
-                SecurityContextHolder.getContext().setAuthentication(authentication);
+            boolean isMatch = false;
+            AntPathMatcher pathMatcher = new AntPathMatcher();
+            String currentURI = request.getRequestURI();
+
+            for (String path : excludePath) {
+                if(pathMatcher.match(currentURI, path)) {
+                    isMatch = true;
+                    break;
+                }
             }
+
+            if(!isMatch) {
+                if (jwtUtils.isValidToken(request)) {
+                    Authentication authentication = jwtUtils.getAuthentication(request);
+                    SecurityContextHolder.getContext().setAuthentication(authentication);
+                }
+                filterChain.doFilter(request, response);
+            } else {
+                filterChain.doFilter(request, response);
+            }
+
         } catch (ExpiredJwtException e) {
             response.sendError(HttpStatus.UNAUTHORIZED.ordinal(), "Invalid signature is used");
         } catch (SignatureException e) {
@@ -41,6 +63,5 @@ public class JwtFilter extends OncePerRequestFilter {
         } catch (UnsupportedJwtException | MalformedJwtException | IllegalArgumentException e) {
             response.sendError(HttpStatus.BAD_REQUEST.ordinal(), e.getMessage());
         }
-        filterChain.doFilter(request, response);
     }
 }

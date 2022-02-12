@@ -29,4 +29,9 @@ public class RefreshToken extends BaseTimeEntity {
         this.accessToken = accessToken;
     }
 
+    public void updateRefreshToken(String uuid, String accessToken) {
+        this.uuid = uuid;
+        this.accessToken = accessToken;
+    }
+
 }

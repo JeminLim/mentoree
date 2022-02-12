@@ -1,5 +1,7 @@
 package com.mentoree.config;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.mentoree.config.security.CustomAuthenticationEntryPoint;
 import com.mentoree.config.security.util.JwtUtils;
 import com.mentoree.participants.repository.ParticipantRepository;
 import com.mentoree.global.repository.TokenRepository;
@@ -27,31 +29,19 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     private final CustomUserDetailService customUserDetailService;
     private final JwtUtils jwtUtils;
+    private final ObjectMapper objectMapper;
     private static final String[] NO_AUTH_PATH = {
-            "/api/login",
-            "/api/join/**",
+            "/api/login/**",
             "/api/reissue",
+            "/api/members/join",
+            "/api/members/join/**",
+            "/api/programs/**",
             "/swagger-ui.html/**",
             "/swagger-resources/**",
             "/v2/api-docs",
             "/webjars/**"
     };
 
-
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return PasswordEncoderFactories.createDelegatingPasswordEncoder();
-    }
-
-    @Bean
-    public WebMvcConfigurer corsConfigurer() {
-        return new WebMvcConfigurer() {
-            @Override
-            public void addCorsMappings(CorsRegistry registry) {
-                registry.addMapping("/**").allowedOrigins("http://localhost:8081");
-            }
-        };
-    }
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
@@ -64,7 +54,10 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .csrf().disable()
                 .authorizeRequests()
                 .antMatchers(NO_AUTH_PATH).permitAll()
-                .anyRequest().authenticated();
+                .anyRequest().authenticated()
+                .and()
+                .exceptionHandling()
+                .authenticationEntryPoint(new CustomAuthenticationEntryPoint(objectMapper));
 
         http
                 .formLogin()
@@ -89,7 +82,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .deleteCookies("JSESSIONID");
 
         http
-                .addFilterAfter(new JwtFilter(jwtUtils), LogoutFilter.class);
+                .addFilterAfter(jwtFilter(), LogoutFilter.class);
 
     }
 
@@ -102,6 +95,29 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     public void configure(AuthenticationManagerBuilder auth) throws Exception{
         auth.authenticationProvider(new CustomAuthenticationProvider(passwordEncoder(), customUserDetailService));
         auth.userDetailsService(customUserDetailService).passwordEncoder(passwordEncoder());
+    }
+
+    //== 빈 등록 ==//
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return PasswordEncoderFactories.createDelegatingPasswordEncoder();
+    }
+
+    @Bean
+    public JwtFilter jwtFilter() {
+        JwtFilter jwtFilter = new JwtFilter(jwtUtils);
+        jwtFilter.excludePath(NO_AUTH_PATH);
+        return jwtFilter;
+    }
+
+    @Bean
+    public WebMvcConfigurer corsConfigurer() {
+        return new WebMvcConfigurer() {
+            @Override
+            public void addCorsMappings(CorsRegistry registry) {
+                registry.addMapping("/**").allowedOrigins("http://localhost:8081");
+            }
+        };
     }
 
 }

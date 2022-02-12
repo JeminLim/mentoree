@@ -75,7 +75,7 @@ export default {
                 page: this.page,
                 participatedPrograms: this.$store.state.user.participatedPrograms,
             };
-            axios.post('/program/list', JSON.stringify(data))
+            axios.post('/programs/list', JSON.stringify(data))
             .then(res => {
                 if(res.data.programList != null ) {
                     this.page += 1;

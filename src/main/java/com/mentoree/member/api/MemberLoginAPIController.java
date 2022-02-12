@@ -4,6 +4,7 @@ import com.mentoree.config.security.util.AESUtils;
 import com.mentoree.config.security.util.JwtUtils;
 import com.mentoree.config.security.util.SecurityConstant;
 import com.mentoree.global.domain.RefreshToken;
+import com.mentoree.global.exception.InvalidTokenException;
 import com.mentoree.global.exception.NoAuthorityException;
 import com.mentoree.member.repository.MemberRepository;
 import com.mentoree.participants.repository.ParticipantRepository;
@@ -46,8 +47,19 @@ public class MemberLoginAPIController {
     @ApiOperation(value = "회원 로그인 성공 후 로직", hidden = true)
     @PostMapping("/login/success")
     public ResponseEntity loginSuccess(HttpServletRequest request, HttpServletResponse response) {
-        // UUID + IP -> IUWT 발급
-        generateTokenCookie(request, response);
+        // UUID + IP -> IUWT 발급 + refreshToken 저장
+        String encryptedUUID = aesUtils.encrypt(UUID.randomUUID().toString());
+        String encryptedIP = aesUtils.encrypt(request.getRemoteAddr());
+        String accessToken = jwtUtils.generateAccessToken(encryptedUUID, encryptedIP);
+
+        // 토큰 및 UUID 쿠키 저장
+        setCookie(response, ACCESS_TOKEN_COOKIE, accessToken, REFRESH_VALID_TIME);
+        setCookie(response, UUID_COOKIE, encryptedUUID, REFRESH_VALID_TIME);
+
+        //refresh token 저장
+        String email = getUsernameFromAuth();
+        RefreshToken refreshToken = RefreshToken.builder().uuid(encryptedUUID).accessToken(accessToken).email(email).build();
+        tokenRepository.save(refreshToken);
 
         Map<String, String> result = new HashMap<>();
         result.put("result", "success");
@@ -74,17 +86,25 @@ public class MemberLoginAPIController {
         String accessToken = cookies.get(ACCESS_TOKEN_COOKIE);
 
         if(!refreshToken.getAccessToken().equals(accessToken)) {
-            throw new NoAuthorityException("비정상 토큰");
+            throw new InvalidTokenException("Refresh token 과 일치하지 않습니다.");
         }
+
         //토큰 갱신
-        generateTokenCookie(request, response);
+        String encryptedUUID = aesUtils.encrypt(UUID.randomUUID().toString());
+        String encryptedIP = aesUtils.encrypt(request.getRemoteAddr());
+        String newToken = jwtUtils.generateAccessToken(encryptedUUID, encryptedIP);
+
+        // 토큰 및 UUID 쿠키 저장
+        setCookie(response, ACCESS_TOKEN_COOKIE, newToken, REFRESH_VALID_TIME);
+        setCookie(response, UUID_COOKIE, encryptedUUID, REFRESH_VALID_TIME);
+
+        //refreshToken 갱신
+        refreshToken.updateRefreshToken(encryptedUUID, newToken);
 
         Map<String, String> result = new HashMap<>();
         result.put("result", "success");
         return ResponseEntity.ok().body(result);
     }
-
-
 
     private String getUsernameFromAuth() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -96,17 +116,6 @@ public class MemberLoginAPIController {
             username = (String) auth.getPrincipal();
         }
         return username;
-    }
-
-    private void generateTokenCookie(HttpServletRequest request, HttpServletResponse response) {
-        String encryptedUUID = aesUtils.encrypt(UUID.randomUUID().toString());
-        String encryptedIP = aesUtils.encrypt(request.getRemoteAddr());
-
-        String accessToken = jwtUtils.generateAccessToken(encryptedUUID, encryptedIP);
-
-        // 토큰 및 UUID 쿠키 저장
-        setCookie(response, ACCESS_TOKEN_COOKIE, accessToken, REFRESH_VALID_TIME);
-        setCookie(response, UUID_COOKIE, encryptedUUID, REFRESH_VALID_TIME);
     }
 
     private void setCookie(HttpServletResponse response, String name, String value, int validationTime) {

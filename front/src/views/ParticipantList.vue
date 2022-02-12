@@ -54,18 +54,20 @@ export default {
             if(this.currentNumMember >= this.programInfo.maxMember) {
                 alert("정원을 초과하였습니다.");
             } else {
-                axios.post('/progrma/' + this.programInfo.id + '/applicants/accept?member=' + memberId)
-                .then(() => {
-                    this.applicants.splice(index, 1);
-                    alert("승인 완료되었습니다.");
-                    this.currentNumMember += 1;
-                }).catch(err => {
-                    console.log(err);
-                });
+                data = {memberId : memberId}
+                axios.post('/programs/' + this.programInfo.id + '/applicants/accept' , data)
+                    .then(() => {
+                        this.applicants.splice(index, 1);
+                        alert("승인 완료되었습니다.");
+                        this.currentNumMember += 1;
+                    }).catch(err => {
+                        console.log(err);
+                    });
             }
         },
         reject(memberId, index) {
-             axios.post('/progrma/' + this.programInfo.id + '/applicants/reject?member=' + memberId)
+            data = {memberId : memberId}
+            axios.post('/programs/' + this.programInfo.id + '/applicants/reject' , data)
                 .then(() => {
                     this.applicants.splice(index, 1);
                     alert("거절 완료되었습니다.");
@@ -82,7 +84,7 @@ export default {
     created() {
         const programId = this.$route.params.programId;
 
-        axios.get('/program/' + programId + '/applicants')
+        axios.get('/programs/' + programId + '/applicants')
         .then(res => {
             this.programInfo = res.data.programInfo;
             if(res.data.applicants != null) {

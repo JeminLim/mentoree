@@ -8,6 +8,5 @@ import java.util.Optional;
 
 public interface MissionCustomRepository {
     Optional<MissionDTO> findMissionById(Long missionId);
-    List<MissionDTO> findCurrentMission(Long programId);
-    List<MissionDTO> findEndedMission(Long programId);
+    List<MissionDTO> findMissionList(Long programId, boolean isOpen);
 }

@@ -87,7 +87,8 @@ export default {
     },
     methods: {
         duplicateCheckEmail() {
-            axios.post('/api/join/check/email?email=' + this.$refs.email.value)
+            data = { email : this.$refs.email.value};
+            axios.post('/members/join/email-check', data)
             .then(res => { 
                 this.duplicateEmail = res.data;
                 if(this.duplicateEmail) {
@@ -98,7 +99,8 @@ export default {
             })
         },
         duplicateCheckNickname() {
-            axios.post('/api/join/check/nickname?nickname=' + this.$refs.nickname.value)
+            data = { email : this.$refs.nickname.value};
+            axios.post('/members/join/nickname-check', data)
             .then(res =>{
                 this.duplicateNickname = res.data;
                 if(this.duplicateNickname) {
@@ -124,7 +126,7 @@ export default {
                     password: this.$refs.password.value,
                 }
 
-                axios.post('/api/join', data)
+                axios.post('/members/join', data)
                 .then(() => {
                     alert("회원가입이 완료되었습니다.");
                     this.$router.push('/login');

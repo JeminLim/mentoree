@@ -93,7 +93,7 @@ export default {
                 mentor: this.$refs.mentor.value,
                 dueDate: this.datePick,
             }
-            axios.post('/program/create', data)
+            axios.post('/programs/new', data)
             .then(res => {
                 alert("프로그램이 생성되었습니다.");
                 this.$store.dispatch('addProgram', res.data).user;

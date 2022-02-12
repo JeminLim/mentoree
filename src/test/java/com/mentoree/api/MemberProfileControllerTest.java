@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mentoree.config.WebConfig;
 import com.mentoree.config.WebSecurityConfig;
 import com.mentoree.config.security.JwtFilter;
+import com.mentoree.global.domain.UserRole;
 import com.mentoree.member.api.MemberProfileAPIController;
 import com.mentoree.member.api.MemberRegisterAPIController;
 import com.mentoree.member.api.dto.MemberDTO;
@@ -22,9 +23,13 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
 import org.springframework.http.MediaType;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
+import java.util.Collections;
 import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -61,7 +66,7 @@ public class MemberProfileControllerTest {
         when(memberRepository.findMemberInfoByEmail(any())).thenReturn(Optional.of(memberInfo));
         //when
         ResultActions result = mockMvc.perform(
-                get("/api/member/profile")
+                get("/api/members/profile")
                         .param("email", "test@email.com")
         );
         //then
@@ -75,12 +80,13 @@ public class MemberProfileControllerTest {
     @DisplayName("유저 프로파일 수정 컨트롤러 테스트")
     public void updateMemberProfile() throws Exception {
         //given
+        SecurityContextHolder.getContext().setAuthentication(new UsernamePasswordAuthenticationToken("test@email.com", "", Collections.singleton(new SimpleGrantedAuthority(UserRole.USER.getKey()))));
         MemberInfo updateInfo = MemberInfo.builder().email("test@email.com").memberName("tester").nickname("changeNick").build();
         when(memberService.updateMemberInfo(any())).thenReturn(updateInfo);
         String requestData = objectMapper.writeValueAsString(updateInfo);
         //when
         ResultActions result = mockMvc.perform(
-                post("/api/member/profile")
+                post("/api/members/profile")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestData)
         );

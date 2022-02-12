@@ -1,7 +1,10 @@
 package com.mentoree.reply.api;
 
 import com.mentoree.board.domain.Board;
+import com.mentoree.global.exception.BindingFailureException;
+import com.mentoree.global.exception.NoAuthorityException;
 import com.mentoree.member.domain.Member;
+import com.mentoree.participants.repository.ParticipantRepository;
 import com.mentoree.reply.domain.Reply;
 import com.mentoree.board.repository.BoardRepository;
 import com.mentoree.member.repository.MemberRepository;
@@ -24,32 +27,36 @@ import java.util.NoSuchElementException;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/programs")
+@RequestMapping("/api")
 public class ReplyAPIController {
 
     private final ReplyRepository replyRepository;
     private final MemberRepository memberRepository;
     private final BoardRepository boardRepository;
+    private final ParticipantRepository participantRepository;
 
     @ApiOperation(value = "댓글 리스트 요청",notes = "게시글 소속 댓글 리스트 반환")
-    @GetMapping("/{programId}/missions/{missionId}/boards/{boardId}/replies")
-    public ResponseEntity getReplies(@ApiParam(value = "해당 프로그램 ID", required = true) @PathVariable("programId") long programId,
-                                     @ApiParam(value = "해당 미션 ID", required = true) @PathVariable("missionId") long missionId,
-                                     @ApiParam(value = "요청 게시글 ID", required = true) @PathVariable("boardId") long boardId) {
+    @GetMapping("/replies/list")
+    public ResponseEntity getReplies(@ApiParam(value = "요청 게시글 ID", required = true) @RequestParam("boardId") long boardId) {
         List<ReplyDTO> reply = replyRepository.findRepliesAllByBoard(boardId);
         return ResponseEntity.ok().body(reply);
     }
 
     //== 댓글 작성 관련 ==//
-    @ApiOperation(value = "댓글 작성 요청",notes = "댓글 작성 결과 반환")
-    @PostMapping("/{programId}/missions/{missionId}/boards/{boardId}/replies/new")
-    public ResponseEntity replyWrite(@ApiParam(value = "해당 프로그램 ID", required = true) @PathVariable("programId") long programId,
-                                     @ApiParam(value = "해당 미션 ID", required = true) @PathVariable("missionId") long missionId,
-                                     @ApiParam(value = "요청 게시글 ID", required = true) @PathVariable("boardId") long boardId,
-                                     @ApiParam(value = "댓글 작성 폼", required = true) @Validated @RequestBody ReplyDTO replyCreateForm,
-                                     BindingResult bindingResult) {
+    @ApiOperation(value = "댓글 작성 요청", notes = "댓글 작성 결과 반환")
+    @PostMapping("/replies/new")
+    public ResponseEntity replyWrite(@ApiParam(value = "댓글 작성 폼", required = true) @Validated @RequestBody ReplyDTO replyCreateForm,
+                                     @ApiParam(hidden = true) BindingResult bindingResult) {
+        if(bindingResult.hasErrors()) {
+            throw new BindingFailureException(bindingResult, "잘못된 댓글 작성 요청입니다.");
+        }
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         String loginEmail = (String) auth.getPrincipal();
+
+        if(!participantRepository.isParticipantByEmailAndBoardId(loginEmail, replyCreateForm.getBoardId())) {
+            throw new NoAuthorityException("참가자가 아닙니다");
+        }
+
         Member login = memberRepository.findByEmail(loginEmail).orElseThrow(NoSuchElementException::new);
         Board target = boardRepository.findById(replyCreateForm.getBoardId()).orElseThrow(NoSuchElementException::new);
         Reply savedReply = replyRepository.save(replyCreateForm.toEntity(target, login));

@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <property name="DIR" value="C:\Users\wer08\Desktop\Portfolio\mentoree"></property>
+    <property name="PREFIX" value="mentoree_log"></property>
+
+    <appender name="TIMETRACE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${DIR}/${PREFIX}_timeElapsed.log</file>
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <Pattern>[%-5level][%d{yyyy-MM-dd HH:mm:ss}][%C] - %msg%n</Pattern>
+        </encoder>
+
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${DIR}/archived/${PREFIX}_timeElapsed.%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <maxFileSize>50MB</maxFileSize>
+            </timeBasedFileNamingAndTriggeringPolicy>
+        </rollingPolicy>
+    </appender>
+
+    <appender name="PARAMTRACE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${DIR}/${PREFIX}_ux_param.log</file>
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <Pattern>[%-5level][%d{yyyy-MM-dd HH:mm:ss}][%C] - %msg%n</Pattern>
+        </encoder>
+
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${DIR}/archived/${PREFIX}_ux_param.%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <maxFileSize>50MB</maxFileSize>
+            </timeBasedFileNamingAndTriggeringPolicy>
+        </rollingPolicy>
+    </appender>
+
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <layout class="ch.qos.logback.classic.PatternLayout">
+            <Pattern>[%-5level][%d{yyyy-MM-dd HH:mm:ss}][%t][%C] - %msg%n</Pattern>
+        </layout>
+    </appender>
+
+
+    <logger name="TimeElapseTrace" levle="WARN" additivity="false">
+        <appender-ref ref="STDOUT"/>
+        <appender-ref ref="TIMETRACE"/>
+    </logger>
+
+    <logger name="ParamErrorTrace" levle="WARN" additivity="false">
+        <appender-ref ref="STDOUT"/>
+        <appender-ref ref="PARAMTRACE"/>
+    </logger>
+
+
+    <root level="info">
+        <appender-ref ref="STDOUT"/>
+    </root>
+
+</configuration>

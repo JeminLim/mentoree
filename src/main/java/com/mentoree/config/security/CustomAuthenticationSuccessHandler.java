@@ -28,7 +28,6 @@ public class CustomAuthenticationSuccessHandler extends SavedRequestAwareAuthent
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
         // security context holder 에 authentication 저장
         SecurityContextHolder.getContext().setAuthentication(authentication);
-
         response.sendRedirect("/api/login/success");
     }
 

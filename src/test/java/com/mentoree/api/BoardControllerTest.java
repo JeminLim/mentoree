@@ -11,6 +11,7 @@ import com.mentoree.config.WebSecurityConfig;
 import com.mentoree.config.security.JwtFilter;
 import com.mentoree.member.domain.Member;
 import com.mentoree.member.repository.MemberRepository;
+import com.mentoree.participants.repository.ParticipantRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -55,6 +56,8 @@ public class BoardControllerTest {
     BoardRepository boardRepository;
     @MockBean
     MemberRepository memberRepository;
+    @MockBean
+    ParticipantRepository participantRepository;
 
     @Autowired
     ObjectMapper objectMapper;
@@ -81,7 +84,7 @@ public class BoardControllerTest {
         //given
         when(boardRepository.findBoardInfoById(any())).thenReturn(Optional.of(boardInfo));
         //when
-        ResultActions response = mockMvc.perform(get("/api/board/1/info"));
+        ResultActions response = mockMvc.perform(get("/api/boards/1"));
         //then
         response.andExpect(status().isOk())
                 .andExpect(jsonPath("$.boardInfo").exists());
@@ -92,10 +95,11 @@ public class BoardControllerTest {
     public void createBoardTest() throws Exception {
         //given
         when(memberRepository.findByEmail(any())).thenReturn(Optional.of(member));
+        when(participantRepository.isParticipantByEmailAndMissionId(any(), any())).thenReturn(true);
         String requestBody = objectMapper.writeValueAsString(boardInfo);
         //when
         ResultActions response = mockMvc.perform(
-                post("/api/board")
+                post("/api/boards/new")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestBody)
         );

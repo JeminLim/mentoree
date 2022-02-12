@@ -13,5 +13,6 @@ public interface ProgramCustomRepository {
     Slice<ProgramInfoDTO> findRecommendPrograms(List<Long> participatedPrograms, List<String> interests, Pageable pageable);
     Slice<ProgramInfoDTO> findAllProgram(List<Long> participatedPrograms, Pageable pageable);
     Optional<ProgramInfoDTO> findProgramById(Long programId);
+    boolean existsByTitle(String title);
 
 }

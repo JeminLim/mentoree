@@ -11,6 +11,7 @@ import com.mentoree.global.repository.ReplyRepository;
 import com.mentoree.member.domain.Member;
 import com.mentoree.member.repository.MemberRepository;
 import com.mentoree.mission.domain.Mission;
+import com.mentoree.participants.repository.ParticipantRepository;
 import com.mentoree.program.domain.Program;
 import com.mentoree.reply.api.ReplyAPIController;
 import com.mentoree.reply.api.dto.ReplyDTO;
@@ -62,6 +63,8 @@ public class ReplyControllerTest {
     MemberRepository memberRepository;
     @MockBean
     BoardRepository boardRepository;
+    @MockBean
+    ParticipantRepository participantRepository;
 
     @Autowired
     ObjectMapper objectMapper;
@@ -98,7 +101,8 @@ public class ReplyControllerTest {
         when(replyRepository.findRepliesAllByBoard(any())).thenReturn(replyList);
         //when
         ResultActions response = mockMvc.perform(
-                get("/api/board/1/reply")
+                get("/api/replies/list")
+                .param("boardId", "1")
         );
         //then
         response.andExpect(status().isOk())
@@ -112,10 +116,11 @@ public class ReplyControllerTest {
         when(memberRepository.findByEmail(any())).thenReturn(Optional.of(member));
         when(boardRepository.findById(any())).thenReturn(Optional.of(board));
         when(replyRepository.save(any())).thenReturn(replyDTO.toEntity(board, member));
+        when(participantRepository.isParticipantByEmailAndBoardId(any(), any())).thenReturn(true);
         String requestBody = objectMapper.writeValueAsString(replyDTO);
         //when
         ResultActions response = mockMvc.perform(
-                post("/api/reply")
+                post("/api/replies/new")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestBody)
         );

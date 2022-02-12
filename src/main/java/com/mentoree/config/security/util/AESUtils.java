@@ -14,13 +14,14 @@ import java.security.*;
 import java.util.Arrays;
 
 @Component
+@RequiredArgsConstructor
 public class AESUtils {
 
     private static final int IV_LENGTH = 16;
     private static final String ALGORITHM = "AES";
     private static final String CIPHER_TRANSFORMATION = "AES/CBC/PKCS5Padding";
 
-    @Value("${spring.jwt.encrypt}")
+    @Value("${spring.jwt.encrypt-key}")
     private String secretKey;
 
     public String encrypt(String message) {

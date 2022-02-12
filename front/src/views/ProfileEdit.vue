@@ -106,7 +106,7 @@ export default {
                 link: this.link,
             }
 
-            axios.post('/member/profile', data)
+            axios.post('/members/profile', data)
             .then(res => {
                 alert("프로필 정보가 변경되었습니다.");
                 this.$store.dispatch('user/update', res.data, {root: true});

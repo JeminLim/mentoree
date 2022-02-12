@@ -49,11 +49,15 @@ dependencies {
 	}
 	implementation "io.swagger:swagger-models:1.5.21"
 
+	// aop
+	implementation 'org.springframework.boot:spring-boot-starter-aop'
 
 	runtimeOnly 'com.h2database:h2'
 	runtimeOnly 'org.mariadb.jdbc:mariadb-java-client'
 	annotationProcessor 'org.projectlombok:lombok'
-	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	testImplementation ('org.springframework.boot:spring-boot-starter-test') {
+		exclude group: "com.vaadin.external.google", module:"android-json"
+	}
 	testImplementation 'org.springframework.security:spring-security-test'
 }
 

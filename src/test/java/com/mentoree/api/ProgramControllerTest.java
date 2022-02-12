@@ -120,7 +120,7 @@ public class ProgramControllerTest {
         String requestBody = objectMapper.writeValueAsString(requestData);
         //when
         ResultActions result = mockMvc.perform(
-                post("/api/program/create")
+                post("/api/programs/new")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestBody)
         );
@@ -143,7 +143,7 @@ public class ProgramControllerTest {
         String requestBody = objectMapper.writeValueAsString(programRequest);
         //when
         ResultActions response = mockMvc.perform(
-                post("/api/program/list")
+                post("/api/programs/list")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestBody));
         //then
@@ -175,7 +175,7 @@ public class ProgramControllerTest {
         String requestBody = objectMapper.writeValueAsString(recommendProgramRequest);
         //when
         ResultActions response = mockMvc.perform(
-                post("/api/program/recommend/list")
+                post("/api/programs/list/recommend")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestBody)
         );
@@ -197,7 +197,7 @@ public class ProgramControllerTest {
 
         //when
         ResultActions response = mockMvc.perform(
-                get("/api/program/1/info")
+                get("/api/programs/1")
         );
         //then
         response.andExpect(status().isOk())
@@ -221,7 +221,7 @@ public class ProgramControllerTest {
         when(programService.applyProgram(any(), any(), any(), any())).thenReturn(true);
         //when
         ResultActions response = mockMvc.perform(
-                post("/api/program/1/join")
+                post("/api/programs/1/join")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestBody)
         );
@@ -241,7 +241,7 @@ public class ProgramControllerTest {
         when(programService.applyProgram(any(), any(), any(), any())).thenReturn(false);
         //when
         ResultActions response = mockMvc.perform(
-                post("/api/program/1/join")
+                post("/api/programs/1/join")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestBody)
         );
@@ -262,9 +262,10 @@ public class ProgramControllerTest {
         when(programRepository.findProgramById(any())).thenReturn(Optional.of(programInfo));
         when(participantRepository.findAllApplicants(any())).thenReturn(applyRequestList);
         when(participantRepository.countCurrentMember(any())).thenReturn(5L);
+        when(participantRepository.isHost(any(), any())).thenReturn(true);
         //when
         ResultActions response = mockMvc.perform(
-                get("/api/program/1/applicants")
+                get("/api/programs/1/applicants")
         );
         //then
         response.andExpect(status().isOk())
@@ -277,10 +278,12 @@ public class ProgramControllerTest {
     @DisplayName("프로그램 참가 승인 컨트롤러 테스트")
     public void applicantTest() throws Exception {
         //given
+        when(participantRepository.isHost(any(), any())).thenReturn(true);
         //when
         ResultActions response = mockMvc.perform(
-                post("/api/program/1/applicants/accept")
-                        .param("memberId", "1")
+                post("/api/programs/1/applicants/accept")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("1")
         );
         //then
         response.andExpect(status().isOk())
@@ -292,16 +295,19 @@ public class ProgramControllerTest {
     @DisplayName("프로그램 참가 거절 컨트롤러 테스트")
     public void applicantRejectTest() throws Exception {
         //given
+        when(participantRepository.isHost(any(), any())).thenReturn(true);
         //when
         ResultActions response = mockMvc.perform(
-                post("/api/program/1/applicants/reject")
-                        .param("memberId", "1")
+                post("/api/programs/1/applicants/reject")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("1")
         );
         //then
         response.andExpect(status().isOk())
                 .andExpect(jsonPath("$.result").value("success"));
         verify(programService, times(1)).reject(any(), any());
     }
+
     private ApplyRequest createApplyRequest(Long id, String message, String nickname, ProgramRole role) {
         ApplyRequest result = new ApplyRequest();
         result.setProgramId(id);

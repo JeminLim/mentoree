@@ -78,7 +78,7 @@ export default {
             this.link = this.$store.state.user.link;
         } else {
             let param = { email : this.$route.params.email}
-            axios.get('/member/profile', param)
+            axios.get('/members/profile', param)
             .then(res => {
                 this.email = res.data.email;
                 this.memberName = res.data.memberName;

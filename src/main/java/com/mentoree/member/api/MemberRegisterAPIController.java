@@ -1,5 +1,6 @@
 package com.mentoree.member.api;
 
+import com.mentoree.global.exception.BindingFailureException;
 import com.mentoree.member.repository.MemberRepository;
 import com.mentoree.member.service.MemberService;
 import com.mentoree.member.api.dto.MemberDTO;
@@ -29,6 +30,9 @@ public class MemberRegisterAPIController {
     @ApiOperation(value = "회원 가입 요청", notes = "회원 가입을 요청의 결과를 반환")
     @PostMapping("/join")
     public ResponseEntity joinMemberPost(@Validated @RequestBody @ApiParam(value = "회원 가입 요청 폼", required = true) MemberRegistRequest registForm, BindingResult bindingResult) {
+        if(bindingResult.hasErrors()) {
+            throw new BindingFailureException(bindingResult);
+        }
         memberService.join(registForm);
         return ResponseEntity.ok().body("success");
     }

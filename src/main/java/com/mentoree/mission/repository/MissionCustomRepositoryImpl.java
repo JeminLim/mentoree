@@ -1,6 +1,7 @@
 package com.mentoree.mission.repository;
 
 import com.querydsl.core.types.Projections;
+import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import javax.persistence.EntityManager;
@@ -32,8 +33,7 @@ public class MissionCustomRepositoryImpl implements MissionCustomRepository{
     }
 
     @Override
-    public List<MissionDTO> findCurrentMission(Long programId) {
-        LocalDate now = LocalDate.now();
+    public List<MissionDTO> findMissionList(Long programId, boolean isOpen) {
         return queryFactory.select(Projections.fields(MissionDTO.class,
                 mission.id,
                 mission.title,
@@ -43,27 +43,13 @@ public class MissionCustomRepositoryImpl implements MissionCustomRepository{
                 .from(mission)
                 .join(mission.program, program)
                 .where(mission.program.id.eq(programId)
-                        .and(mission.dueDate.after(now)))
+                        ,isOpen(isOpen))
                 .fetch();
     }
 
-    @Override
-    public List<MissionDTO> findEndedMission(Long programId) {
+    private BooleanExpression isOpen(boolean isOpen) {
         LocalDate now = LocalDate.now();
-        return queryFactory.select(Projections.fields(MissionDTO.class,
-                mission.id,
-                mission.title,
-                mission.goal,
-                mission.content,
-                mission.dueDate))
-                .from(mission)
-                .join(mission.program, program)
-                .where(mission.program.id.eq(programId)
-                        .and(mission.dueDate.before(now)))
-                .fetch();
+        return isOpen ? mission.dueDate.after(now) : mission.dueDate.before(now);
     }
-
-
-
 
 }

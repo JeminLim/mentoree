@@ -19,3 +19,6 @@ spring:
         use_sql_comments: true
     open-in-view: false
 
+  jwt:
+    secret-key: Be2hgS70ZpK8PEpbcOKOWkFoBllqSBxeGyjRQBt1L83XqGy5f2vijmHZaUGEvTJygBuEnsE6E40OYtK1i9WF3w
+    encrypt-key: 12345678901234567890123456789012

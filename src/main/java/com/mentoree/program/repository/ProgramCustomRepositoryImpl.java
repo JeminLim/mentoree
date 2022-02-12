@@ -3,6 +3,7 @@ package com.mentoree.program.repository;
 import com.mentoree.global.repository.util.RepositoryHelper;
 import com.mentoree.program.domain.ProgramRole;
 import com.querydsl.core.types.Projections;
+import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
@@ -40,11 +41,9 @@ public class ProgramCustomRepositoryImpl implements ProgramCustomRepository{
                 program.description,
                 program.dueDate))
                 .from(program)
-                .join(program.category, category)
-                .join(program.participants, participant)
-                .where( program.id.notIn(participatedPrograms),
-                        program.category.categoryName.in(interests)
-                        ,program.isOpen.eq(true))
+                .where( notInParticipatedPrograms(participatedPrograms),
+                        inInterestCategory(interests),
+                        program.isOpen.eq(true))
                 .limit(pageable.getPageSize() + 1)
                 .offset(pageable.getOffset())
                 .fetch();
@@ -52,8 +51,7 @@ public class ProgramCustomRepositoryImpl implements ProgramCustomRepository{
         if(mentorInProgram != null)
             queryResults.forEach(o -> o.setMentor(mentorInProgram.get(o.getId())));
 
-        Slice<ProgramInfoDTO> recommendPrograms = RepositoryHelper.toSlice(queryResults, pageable);
-        return recommendPrograms;
+        return RepositoryHelper.toSlice(queryResults, pageable);
     }
 
     @Override
@@ -67,9 +65,7 @@ public class ProgramCustomRepositoryImpl implements ProgramCustomRepository{
                 program.description,
                 program.dueDate))
                 .from(program)
-                .join(program.category, category)
-                .join(program.participants, participant)
-                .where( program.id.notIn(participatedPrograms),
+                .where( notInParticipatedPrograms(participatedPrograms),
                         program.isOpen.eq(true))
                 .limit(pageable.getPageSize() + 1)
                 .offset(pageable.getOffset())
@@ -79,8 +75,7 @@ public class ProgramCustomRepositoryImpl implements ProgramCustomRepository{
         if(mentorInProgram != null)
             result.forEach(o -> o.setMentor(mentorInProgram.get(o.getId())));
 
-        Slice<ProgramInfoDTO> allPrograms = RepositoryHelper.toSlice(result, pageable);
-        return allPrograms;
+        return RepositoryHelper.toSlice(result, pageable);
     }
 
     @Override
@@ -106,6 +101,21 @@ public class ProgramCustomRepositoryImpl implements ProgramCustomRepository{
         }
 
         return Optional.ofNullable(programInfoDTO);
+    }
+
+    @Override
+    public boolean existsByTitle(String title) {
+        return queryFactory.selectFrom(program)
+                .where(program.programName.eq(title))
+                .fetchCount() > 0;
+    }
+
+    private BooleanExpression notInParticipatedPrograms(List<Long> participatedPrograms) {
+        return participatedPrograms != null ? program.id.notIn(participatedPrograms) : null;
+    }
+
+    private BooleanExpression inInterestCategory(List<String> interests) {
+        return interests != null ? program.category.categoryName.in(interests) : null;
     }
 
     private List<Long> toProgramIds(List<ProgramInfoDTO> result) {

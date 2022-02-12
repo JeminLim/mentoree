@@ -79,7 +79,7 @@ export default {
                 interests: this.$store.state.user.interests
             };
 
-            axios.post('/program/recommend/list', JSON.stringify(data))
+            axios.post('/programs/list/recommend', JSON.stringify(data))
             .then(res => {
                 if (res.data.programRecommendList != null) {
                     this.page += 1;

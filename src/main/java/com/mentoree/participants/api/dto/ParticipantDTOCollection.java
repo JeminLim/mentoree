@@ -3,6 +3,7 @@ package com.mentoree.participants.api.dto;
 import com.mentoree.program.domain.ProgramRole;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -47,6 +48,7 @@ public class ParticipantDTOCollection {
     @Getter
     @Setter
     @NoArgsConstructor
+    @AllArgsConstructor
     @ApiModel(description = "프로그램 참가 신청 폼")
     public static class ApplyRequest {
 

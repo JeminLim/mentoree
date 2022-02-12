@@ -30,8 +30,7 @@ public class MemberDTO {
         private String email;
 
         @NotBlank
-        @Range(min = 8, max = 16)
-        @Pattern(regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[$@$!%*?&#%])[A-Za-z\\d$@$!%*?&]{8,16}")
+        @Pattern(regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[$@!%*?&#])[A-Za-z\\d$@!%*?&]{8,16}")
         @ApiModelProperty(value = "비밀번호", notes = "최소 8자 이상 최대 16자 이하, 최소 하나 이상의 대,소문자, 숫자, 특수문자 요구")
         private String password;
 
@@ -40,8 +39,8 @@ public class MemberDTO {
         private String memberName;
 
         @NotBlank
-        @Range(min = 2, max = 15)
-        @ApiModelProperty(value = "회원 이름", notes = "최소 2자 이상 최대 15이하")
+        @Pattern(regexp = "^[A-Za-z가-힣]{2,15}")
+        @ApiModelProperty(value = "회원 닉네임", notes = "최소 2자 이상 최대 15이하")
         private String nickname;
 
         @Builder

@@ -1,6 +1,7 @@
 package com.mentoree.mission.api;
 
 import com.mentoree.board.repository.BoardRepository;
+import com.mentoree.config.security.UserPrincipal;
 import com.mentoree.global.exception.BindingFailureException;
 import com.mentoree.global.exception.NoAuthorityException;
 import com.mentoree.mission.repository.MissionRepository;
@@ -67,7 +68,7 @@ public class MissionAPIController {
         }
 
 
-        String loginUser = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        String loginUser = ((UserPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getEmail();
         if(!participantRepository.isParticipantByEmailAndProgramId(loginUser, missionDTO.getProgramId())
                 || !participantRepository.isMentor(loginUser, missionDTO.getProgramId())){
             throw new NoAuthorityException("참가자가 아닙니다.");

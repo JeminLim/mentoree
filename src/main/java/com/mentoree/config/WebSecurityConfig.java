@@ -71,7 +71,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .oauth2Login()
                 .loginPage("/login")
                 .userInfoEndpoint()
-                .userService(customUserDetailService);
+                .userService(customUserDetailService)
+                .and()
+                .defaultSuccessUrl("/api/login/success");
 
 
         http

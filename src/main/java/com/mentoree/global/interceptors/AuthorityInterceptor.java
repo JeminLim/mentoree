@@ -1,5 +1,6 @@
 package com.mentoree.global.interceptors;
 
+import com.mentoree.config.security.UserPrincipal;
 import com.mentoree.global.exception.NoAuthorityException;
 import com.mentoree.participants.repository.ParticipantRepository;
 import lombok.RequiredArgsConstructor;
@@ -19,9 +20,7 @@ public class AuthorityInterceptor implements HandlerInterceptor {
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String email = (String) authentication.getPrincipal();
+        String email = ((UserPrincipal)SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getEmail();
 
         String requestURI = request.getRequestURI();
 

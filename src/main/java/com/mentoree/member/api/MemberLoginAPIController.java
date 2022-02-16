@@ -1,6 +1,8 @@
 package com.mentoree.member.api;
 
+import com.mentoree.config.security.UserPrincipal;
 import com.mentoree.config.security.util.AESUtils;
+import com.mentoree.config.security.util.EncryptUtils;
 import com.mentoree.config.security.util.JwtUtils;
 import com.mentoree.config.security.util.SecurityConstant;
 import com.mentoree.global.domain.RefreshToken;
@@ -40,7 +42,7 @@ import static com.mentoree.program.api.dto.ProgramDTO.*;
 public class MemberLoginAPIController {
 
     private final JwtUtils jwtUtils;
-    private final AESUtils aesUtils;
+    private final EncryptUtils encryptUtils;
     private final TokenRepository tokenRepository;
 
     //== 로그인 ==//
@@ -48,8 +50,8 @@ public class MemberLoginAPIController {
     @PostMapping("/login/success")
     public ResponseEntity loginSuccess(HttpServletRequest request, HttpServletResponse response) {
         // UUID + IP -> IUWT 발급 + refreshToken 저장
-        String encryptedUUID = aesUtils.encrypt(UUID.randomUUID().toString());
-        String encryptedIP = aesUtils.encrypt(request.getRemoteAddr());
+        String encryptedUUID = encryptUtils.encrypt(UUID.randomUUID().toString());
+        String encryptedIP = encryptUtils.encrypt(request.getRemoteAddr());
         String accessToken = jwtUtils.generateAccessToken(encryptedUUID, encryptedIP);
 
         // 토큰 및 UUID 쿠키 저장
@@ -57,7 +59,7 @@ public class MemberLoginAPIController {
         setCookie(response, UUID_COOKIE, encryptedUUID, REFRESH_VALID_TIME);
 
         //refresh token 저장
-        String email = getUsernameFromAuth();
+        String email = ((UserPrincipal)SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getEmail(); // 아마 Oauth2 로그인에서 문제가 생길수도
         RefreshToken refreshToken = RefreshToken.builder().uuid(encryptedUUID).accessToken(accessToken).email(email).build();
         tokenRepository.save(refreshToken);
 
@@ -79,7 +81,7 @@ public class MemberLoginAPIController {
     public ResponseEntity reissueToken(HttpServletRequest request, HttpServletResponse response) {
 
         //== DB 토큰과 검증 ==//
-        String email = getUsernameFromAuth();
+        String email = ((UserPrincipal)SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getEmail();
         RefreshToken refreshToken = tokenRepository.findByEmail(email).orElseThrow(NoSuchElementException::new);
 
         Map<String, String> cookies = Arrays.stream(request.getCookies()).collect(Collectors.toMap(Cookie::getName, Cookie::getValue));
@@ -90,8 +92,8 @@ public class MemberLoginAPIController {
         }
 
         //토큰 갱신
-        String encryptedUUID = aesUtils.encrypt(UUID.randomUUID().toString());
-        String encryptedIP = aesUtils.encrypt(request.getRemoteAddr());
+        String encryptedUUID = encryptUtils.encrypt(UUID.randomUUID().toString());
+        String encryptedIP = encryptUtils.encrypt(request.getRemoteAddr());
         String newToken = jwtUtils.generateAccessToken(encryptedUUID, encryptedIP);
 
         // 토큰 및 UUID 쿠키 저장
@@ -104,18 +106,6 @@ public class MemberLoginAPIController {
         Map<String, String> result = new HashMap<>();
         result.put("result", "success");
         return ResponseEntity.ok().body(result);
-    }
-
-    private String getUsernameFromAuth() {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        String username = "";
-        if(auth instanceof OAuth2AuthenticationToken) {
-            username = (String) ((OAuth2AuthenticationToken) auth).getPrincipal().getAttributes().get("email");;
-        }
-        else if(auth instanceof UsernamePasswordAuthenticationToken ) {
-            username = (String) auth.getPrincipal();
-        }
-        return username;
     }
 
     private void setCookie(HttpServletResponse response, String name, String value, int validationTime) {

@@ -1,6 +1,7 @@
 package com.mentoree.reply.api;
 
 import com.mentoree.board.domain.Board;
+import com.mentoree.config.security.UserPrincipal;
 import com.mentoree.global.exception.BindingFailureException;
 import com.mentoree.global.exception.NoAuthorityException;
 import com.mentoree.member.domain.Member;
@@ -50,8 +51,7 @@ public class ReplyAPIController {
         if(bindingResult.hasErrors()) {
             throw new BindingFailureException(bindingResult, "잘못된 댓글 작성 요청입니다.");
         }
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        String loginEmail = (String) auth.getPrincipal();
+        String loginEmail = ((UserPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getEmail();
 
         if(!participantRepository.isParticipantByEmailAndBoardId(loginEmail, replyCreateForm.getBoardId())) {
             throw new NoAuthorityException("참가자가 아닙니다");

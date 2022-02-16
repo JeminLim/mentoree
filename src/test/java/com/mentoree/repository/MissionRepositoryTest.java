@@ -22,7 +22,6 @@ import java.util.NoSuchElementException;
 import static com.mentoree.mission.api.dto.MissionDTOCollection.*;
 import static org.assertj.core.api.Assertions.*;
 
-@ExtendWith(SpringExtension.class)
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 public class MissionRepositoryTest {

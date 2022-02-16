@@ -1,5 +1,6 @@
 package com.mentoree.member.api;
 
+import com.mentoree.config.security.UserPrincipal;
 import com.mentoree.global.exception.BindingFailureException;
 import com.mentoree.global.exception.NoAuthorityException;
 import com.mentoree.member.api.dto.MemberDTO.MemberInfo;
@@ -45,7 +46,7 @@ public class MemberProfileAPIController {
         if(bindingResult.hasErrors()) {
             throw new BindingFailureException(bindingResult);
         }
-        String loginEmail = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        String loginEmail = ((UserPrincipal)SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getEmail();
         if(!updatedInfo.getEmail().equals(loginEmail)) {
             throw new NoAuthorityException("해당 사용자가 아닙니다");
         }

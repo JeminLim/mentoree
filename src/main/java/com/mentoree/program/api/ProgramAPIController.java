@@ -1,5 +1,6 @@
 package com.mentoree.program.api;
 
+import com.mentoree.config.security.UserPrincipal;
 import com.mentoree.global.exception.BindingFailureException;
 import com.mentoree.global.exception.NoAuthorityException;
 import com.mentoree.member.domain.Member;
@@ -54,9 +55,7 @@ public class ProgramAPIController {
             throw new BindingFailureException(bindingResult, "잘못된 프로그램 생성 요청입니다.");
         }
 
-        log.info("program registry .....");
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        String email = (String) auth.getPrincipal();
+        String email = ((UserPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getEmail();
         Member findMember = memberRepository.findByEmail(email).orElseThrow(NoSuchElementException::new);
 
         createForm.setProgramRole(createForm.getMentor() ? ProgramRole.MENTOR.getKey() : ProgramRole.MENTEE.getKey());
@@ -114,8 +113,7 @@ public class ProgramAPIController {
     @GetMapping("/{programId}")
     public ResponseEntity programInfoGet(@ApiParam(value = "요청 프로그램 Id", required = true) @PathVariable("programId") long programId) {
         ProgramInfoDTO programInfoDTO = programRepository.findProgramById(programId).orElseThrow(NoSuchElementException::new);
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        String loginEmail = (String) auth.getPrincipal();
+        String loginEmail = ((UserPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getEmail();
         Participant host = participantRepository.findHost(programId).orElseThrow(NoSuchElementException::new);
         boolean isHost = loginEmail.equals(host.getMember().getEmail()) ? true : false;
 
@@ -134,8 +132,7 @@ public class ProgramAPIController {
             throw new BindingFailureException(bindingResult, "잘못된 참가 신청 요청입니다.");
         }
 
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        String email = (String) auth.getPrincipal();
+        String email = ((UserPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getEmail();
         Member loginMember = memberRepository.findByEmail(email).orElseThrow(NoSuchElementException::new);
 
         String msg = "";
@@ -161,7 +158,7 @@ public class ProgramAPIController {
     public ResponseEntity programApplicationListGet(@ApiParam(value = "관리 프로그램 ID", required = true) @PathVariable("programId") long programId) {
 
         // 요청자 해당 프로그램 호스트 판별
-        String loginEmail = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        String loginEmail = ((UserPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getEmail();
         if(!participantRepository.isHost(loginEmail, programId)) {
             throw new NoAuthorityException("프로그램 개최자가 아닙니다");
         }
@@ -183,7 +180,7 @@ public class ProgramAPIController {
     public ResponseEntity applicantAccept(@ApiParam(value = "승인 대상자 ID", required = true) @RequestBody Long memberId,
                                             @ApiParam(value = "관리 프로그램 ID", required = true) @PathVariable("programId") Long programId) {
         // 요청자 해당 프로그램 호스트 판별
-        String loginEmail = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        String loginEmail = ((UserPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getEmail();
         if(!participantRepository.isHost(loginEmail, programId)) {
             throw new NoAuthorityException("프로그램 개최자가 아닙니다");
         }
@@ -201,7 +198,7 @@ public class ProgramAPIController {
     public ResponseEntity applicantReject(@ApiParam(value = "거절 대상자 ID", required = true) @RequestBody Long memberId,
                                           @ApiParam(value = "관리 프로그램 ID", required = true) @PathVariable("programId") Long programId) {
         // 요청자 해당 프로그램 호스트 판별
-        String loginEmail = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        String loginEmail = ((UserPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getEmail();
         if(!participantRepository.isHost(loginEmail, programId)) {
             throw new NoAuthorityException("프로그램 개최자가 아닙니다");
         }

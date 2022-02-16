@@ -4,7 +4,9 @@ import com.mentoree.board.domain.Board;
 import com.mentoree.board.repository.BoardRepository;
 import com.mentoree.category.domain.Category;
 import com.mentoree.category.repository.CategoryRepository;
+import com.mentoree.config.security.UserPrincipal;
 import com.mentoree.config.security.util.AESUtils;
+import com.mentoree.config.security.util.EncryptUtils;
 import com.mentoree.config.security.util.JwtUtils;
 import com.mentoree.config.security.util.SecurityConstant;
 import com.mentoree.global.domain.UserRole;
@@ -59,7 +61,7 @@ public class DataPreparation {
     @Autowired
     JwtUtils jwtUtils;
     @Autowired
-    AESUtils aesUtils;
+    EncryptUtils encryptUtils;
     @Autowired
     TokenRepository tokenRepository;
 
@@ -134,13 +136,14 @@ public class DataPreparation {
     public void initLogin() {
 
         List<GrantedAuthority> authorities = Collections.singletonList(new SimpleGrantedAuthority(UserRole.USER.getKey()));
-        UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken("memberA@email.com", "", authorities);
+        UserPrincipal principal = UserPrincipal.builder().email("memberA@email.com").password("").authorities(authorities).build();
+        UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(principal, "", authorities);
         SecurityContextHolder.getContext().setAuthentication(auth);
 
         String randomUUID = UUID.randomUUID().toString();
-        String encryptedUUID = aesUtils.encrypt(randomUUID);
+        String encryptedUUID = encryptUtils.encrypt(randomUUID);
         String ip = "127.0.0.1";
-        String accessToken = jwtUtils.generateAccessToken(encryptedUUID, aesUtils.encrypt(ip));
+        String accessToken = jwtUtils.generateAccessToken(encryptedUUID, encryptUtils.encrypt(ip));
 
         Cookie tokenCookie = new Cookie(ACCESS_TOKEN_COOKIE, accessToken);
         Cookie uuidCookie = new Cookie(UUID_COOKIE, encryptedUUID);

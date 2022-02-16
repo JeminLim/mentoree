@@ -1,5 +1,6 @@
 package com.mentoree.config.security.util;
 
+import com.mentoree.config.security.UserPrincipal;
 import com.mentoree.global.exception.InvalidTokenException;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
@@ -70,7 +71,10 @@ public class JwtUtils {
             List<SimpleGrantedAuthority> authorities = Arrays.stream(claims.get("authorities").toString().split(","))
                     .map(SimpleGrantedAuthority::new)
                     .collect(Collectors.toList());
-            return new UsernamePasswordAuthenticationToken(claims.getSubject(), "", authorities);
+
+            UserPrincipal principal = UserPrincipal.builder().email(claims.getSubject()).password("").authorities(authorities).build();
+
+            return new UsernamePasswordAuthenticationToken(principal, "", authorities);
 
         } catch (UnsupportedJwtException | MalformedJwtException | SignatureException | IllegalArgumentException exception) {
             throw new InvalidTokenException("비정상적 또는 변조된 토큰입니다");
@@ -80,13 +84,7 @@ public class JwtUtils {
     public String generateAccessToken(String encryptedUUID, String encryptedIP) {
 
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        String username = "";
-        if(auth instanceof OAuth2AuthenticationToken) {
-            username = (String) ((OAuth2AuthenticationToken) auth).getPrincipal().getAttributes().get("email");;
-        }
-        else if(auth instanceof UsernamePasswordAuthenticationToken ) {
-            username = (String) auth.getPrincipal();
-        }
+        String username = ((UserPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getEmail();
 
         String authorities = auth.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)

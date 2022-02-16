@@ -1,4 +1,4 @@
-package com.mentoree.api;
+package com.mentoree.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mentoree.board.repository.BoardRepository;
@@ -6,10 +6,11 @@ import com.mentoree.config.WebConfig;
 import com.mentoree.config.WebSecurityConfig;
 import com.mentoree.config.security.JwtFilter;
 import com.mentoree.global.domain.UserRole;
+import com.mentoree.member.api.MemberProfileAPIController;
 import com.mentoree.mission.api.MissionAPIController;
-import com.mentoree.mission.api.dto.MissionDTOCollection;
 import com.mentoree.mission.repository.MissionRepository;
 import com.mentoree.mission.service.MissionService;
+import com.mentoree.mock.WithCustomMockUser;
 import com.mentoree.participants.repository.ParticipantRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -40,6 +41,7 @@ import static com.mentoree.board.api.dto.BoardDTO.*;
 import static com.mentoree.mission.api.dto.MissionDTOCollection.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -47,9 +49,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(
         controllers = MissionAPIController.class,
-        excludeFilters = {@ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = {WebSecurityConfig.class, WebConfig.class, JwtFilter.class})},
-        excludeAutoConfiguration = {SecurityAutoConfiguration.class, SecurityFilterAutoConfiguration.class,
-                OAuth2ClientAutoConfiguration.class, OAuth2ResourceServerAutoConfiguration.class}
+        excludeFilters = {@ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = {WebSecurityConfig.class, WebConfig.class})}
 )
 public class MissionControllerTest {
 
@@ -73,8 +73,6 @@ public class MissionControllerTest {
 
     @BeforeEach
     void setUp() {
-        UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken("test@eamil.com", "", Collections.singleton(new SimpleGrantedAuthority(UserRole.USER.getValue())));
-        SecurityContextHolder.getContext().setAuthentication(auth);
         missionDTO = MissionDTO.builder().goal("testGoal").dueDate(LocalDate.now()).content("content").id(1L).title("missionTitle").build();
         MissionDTO missionDTO2 = MissionDTO.builder().goal("testGoal2").dueDate(LocalDate.now()).content("content2").id(2L).title("missionTitle2").build();
         missionDTOList.add(missionDTO);
@@ -82,6 +80,7 @@ public class MissionControllerTest {
     }
 
     @Test
+    @WithCustomMockUser
     @DisplayName("현재 진행 중인 미션 수신 컨트롤러 테스트")
     public void getCurrentMissionTest() throws Exception {
         //given
@@ -98,6 +97,7 @@ public class MissionControllerTest {
 
 
     @Test
+    @WithCustomMockUser
     @DisplayName("종료된 미션 수신 컨트롤러 테스트")
     public void getPastMissionTest() throws Exception {
         //given
@@ -114,6 +114,7 @@ public class MissionControllerTest {
     }
 
     @Test
+    @WithCustomMockUser
     @DisplayName("미션 정보 받아오기 컨트롤러 테스트")
     public void getMissionInfoTest() throws Exception {
         //given
@@ -136,6 +137,7 @@ public class MissionControllerTest {
     }
 
     @Test
+    @WithCustomMockUser
     @DisplayName("미션 생성 컨트롤러 테스트")
     public void createMissionTest() throws Exception {
         //given
@@ -153,6 +155,7 @@ public class MissionControllerTest {
         //when
         ResultActions response = mockMvc.perform(
                 post("/api/missions/new")
+                        .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestBody)
         );

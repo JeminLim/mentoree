@@ -26,7 +26,6 @@ import java.util.Optional;
 import static com.mentoree.participants.api.dto.ParticipantDTOCollection.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
-@ExtendWith(SpringExtension.class)
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 public class ParticipantRepositoryTest {

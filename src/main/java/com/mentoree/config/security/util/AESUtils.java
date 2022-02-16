@@ -15,7 +15,7 @@ import java.util.Arrays;
 
 @Component
 @RequiredArgsConstructor
-public class AESUtils {
+public class AESUtils implements EncryptUtils{
 
     private static final int IV_LENGTH = 16;
     private static final String ALGORITHM = "AES";
@@ -24,6 +24,7 @@ public class AESUtils {
     @Value("${spring.jwt.encrypt-key}")
     private String secretKey;
 
+    @Override
     public String encrypt(String message) {
         try {
             // Key spec
@@ -50,6 +51,7 @@ public class AESUtils {
         }
     }
 
+    @Override
     public String decrypt(String message) {
         try {
             byte[] byteMessage = Base64.decodeBase64(message);

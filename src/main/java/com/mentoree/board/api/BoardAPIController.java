@@ -1,5 +1,6 @@
 package com.mentoree.board.api;
 
+import com.mentoree.config.security.UserPrincipal;
 import com.mentoree.global.exception.BindingFailureException;
 import com.mentoree.global.exception.NoAuthorityException;
 import com.mentoree.member.domain.Member;
@@ -54,12 +55,12 @@ public class BoardAPIController {
             throw new BindingFailureException(bindingResult, "잘못된 게시글 작성 요청입니다.");
         }
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String email = (String) authentication.getPrincipal();
+        UserPrincipal principal = (UserPrincipal) authentication.getPrincipal();
+        String email = principal.getEmail();
 
         if(!participantRepository.isParticipantByEmailAndMissionId(email, createRequest.getMissionId())) {
             throw new NoAuthorityException("참가자가 아닙니다.");
         }
-
 
         Member loginUser = memberRepository.findByEmail(email).orElseThrow(NoSuchElementException::new);
         boardService.saveBoard(createRequest, loginUser);

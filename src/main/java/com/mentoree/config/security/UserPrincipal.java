@@ -12,15 +12,13 @@ import java.util.*;
 @Getter
 public class UserPrincipal implements UserDetails {
 
-    private Long id;
     private String email;
     private String password;
     private Collection<? extends GrantedAuthority> authorities = new ArrayList<>();
     private Map<String, Object> attributes;
 
     @Builder
-    public UserPrincipal(Long id, String email, String password, Collection<? extends GrantedAuthority> authorities) {
-        this.id = id;
+    public UserPrincipal(String email, String password, Collection<? extends GrantedAuthority> authorities) {
         this.email = email;
         this.password = password;
         this.authorities = authorities;
@@ -29,7 +27,7 @@ public class UserPrincipal implements UserDetails {
     public static UserPrincipal create(Member member) {
         List<GrantedAuthority> authorities = Collections.singletonList(new SimpleGrantedAuthority(member.getRole().getKey()));
 
-        return new UserPrincipal(member.getId(), member.getEmail(), member.getUserPassword(), authorities);
+        return new UserPrincipal(member.getEmail(), member.getUserPassword(), authorities);
     }
 
 

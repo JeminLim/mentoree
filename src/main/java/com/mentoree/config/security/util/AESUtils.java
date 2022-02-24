@@ -60,7 +60,6 @@ public class AESUtils implements EncryptUtils{
             byte[] ivBytes = Arrays.copyOfRange(byteMessage, 0, IV_LENGTH);
             IvParameterSpec ivSpec = new IvParameterSpec(ivBytes);
 
-
             byte[] encryptKeyBytes = secretKey.getBytes(StandardCharsets.UTF_8);
             SecretKeySpec keySpec = new SecretKeySpec(encryptKeyBytes, ALGORITHM);
 
@@ -83,8 +82,4 @@ public class AESUtils implements EncryptUtils{
         random.nextBytes(ivByte);
         return ivByte;
     }
-
-
-
-
 }

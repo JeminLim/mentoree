@@ -34,7 +34,7 @@ import java.util.Objects;
 @RestControllerAdvice
 public class GlobalControllerAdvice {
 
-    private Logger paramLogger = LoggerFactory.getLogger("ParamErrorTrace");
+    private Logger paramLogger = LoggerFactory.getLogger("ErrorDetail");
 
     @ExceptionHandler(BadCredentialsException.class)
     protected ResponseEntity<ErrorResponse> handleBadCredentialException(BadCredentialsException e) {
@@ -47,7 +47,7 @@ public class GlobalControllerAdvice {
     protected ResponseEntity<ErrorResponse> handleIllegalStateException(IllegalStateException e) {
         log.error("[IllegalStateException] error : {}" ,e.getMessage());
         final ErrorResponse response = ErrorResponse.of(ErrorCode.ILLEGAL_STATEMENT);
-        return new ResponseEntity<>(response,HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(BindingFailureException.class)
@@ -112,9 +112,4 @@ public class GlobalControllerAdvice {
         final ErrorResponse response = ErrorResponse.of(ErrorCode.NO_AUTHORITY, e.getMessage());
         return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
     }
-
-
-
-
-
 }

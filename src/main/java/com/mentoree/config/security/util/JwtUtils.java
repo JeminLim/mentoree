@@ -4,7 +4,6 @@ import com.mentoree.config.security.UserPrincipal;
 import com.mentoree.global.exception.InvalidTokenException;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
-import io.jsonwebtoken.io.Encoders;
 import io.jsonwebtoken.security.Keys;
 import io.jsonwebtoken.security.SignatureException;
 import lombok.RequiredArgsConstructor;
@@ -15,7 +14,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.stereotype.Component;
 
 import javax.servlet.http.Cookie;
@@ -37,11 +35,12 @@ public class JwtUtils {
     private String SECRET_KEY;
 
     private static final String IS_MOBILE = "MOBI";
-    private final AESUtils aesUtils;
+    private final EncryptUtils encryptUtils;
 
 
     public Authentication getAuthentication(HttpServletRequest request) {
         try {
+
             Map<String, String> cookies = Arrays.stream(request.getCookies()).collect(Collectors.toMap(Cookie::getName, Cookie::getValue));
             String accessToken = cookies.get(ACCESS_TOKEN_COOKIE);
 
@@ -53,7 +52,7 @@ public class JwtUtils {
             // pc -> ip 주소 비교 검증
             String userAgent = request.getHeader("User-Agent").toUpperCase();
             if(!userAgent.contains(IS_MOBILE)) {
-                String tokenIP = aesUtils.decrypt((String) claims.get("ip"));
+                String tokenIP = encryptUtils.decrypt((String) claims.get("ip"));
                 String clientIP = request.getRemoteAddr();
 
                 if(!clientIP.equals(tokenIP)) {
@@ -61,8 +60,8 @@ public class JwtUtils {
                 }
             }
             // 토큰 안 UUID 와 UUID 쿠키 비교 검증증
-            String tokenUUID = aesUtils.decrypt((String) claims.get("uuid"));
-            String cookieUUID = aesUtils.decrypt(cookies.get(UUID_COOKIE));
+            String tokenUUID = encryptUtils.decrypt((String) claims.get("uuid"));
+            String cookieUUID = encryptUtils.decrypt(cookies.get(UUID_COOKIE));
 
             if(!tokenUUID.equals(cookieUUID)) {
                 throw new InvalidTokenException("비정상적 또는 변조된 토큰입니다");
@@ -100,7 +99,6 @@ public class JwtUtils {
                 .signWith(getKey(), SignatureAlgorithm.HS512)
                 .compact();
     }
-
 
    private Key getKey() {
         byte[] keyBytes = Decoders.BASE64.decode(SECRET_KEY);

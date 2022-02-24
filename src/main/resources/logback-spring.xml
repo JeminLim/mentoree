@@ -1,30 +1,30 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
-    <property name="DIR" value="C:\Users\wer08\Desktop\Portfolio\mentoree"></property>
-    <property name="PREFIX" value="mentoree_log"></property>
+    <property name="DIR" value="C:/Users/wer08/Desktop/Portfolio/mentoree/logs"/>
+    <property name="PREFIX" value="mentoree_"/>
 
-    <appender name="TIMETRACE" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>${DIR}/${PREFIX}_timeElapsed.log</file>
+    <appender name="ErrorDetail" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${DIR}/${PREFIX}_error.log</file>
         <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
-            <Pattern>[%-5level][%d{yyyy-MM-dd HH:mm:ss}][%C] - %msg%n</Pattern>
+            <Pattern>%msg%n</Pattern>
         </encoder>
 
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <fileNamePattern>${DIR}/archived/${PREFIX}_timeElapsed.%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <fileNamePattern>${DIR}/archived/${PREFIX}_error.%d{yyyy-MM-dd}.%i.log</fileNamePattern>
             <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
                 <maxFileSize>50MB</maxFileSize>
             </timeBasedFileNamingAndTriggeringPolicy>
         </rollingPolicy>
     </appender>
 
-    <appender name="PARAMTRACE" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>${DIR}/${PREFIX}_ux_param.log</file>
+    <appender name="event" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${DIR}/${PREFIX}_event.log</file>
         <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
-            <Pattern>[%-5level][%d{yyyy-MM-dd HH:mm:ss}][%C] - %msg%n</Pattern>
+            <Pattern>%msg%n</Pattern>
         </encoder>
 
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <fileNamePattern>${DIR}/archived/${PREFIX}_ux_param.%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <fileNamePattern>${DIR}/archived/${PREFIX}_event.%d{yyyy-MM-dd}.%i.log</fileNamePattern>
             <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
                 <maxFileSize>50MB</maxFileSize>
             </timeBasedFileNamingAndTriggeringPolicy>
@@ -37,17 +37,15 @@
         </layout>
     </appender>
 
-
-    <logger name="TimeElapseTrace" levle="WARN" additivity="false">
+    <logger name="ErrorDetail" level="WARN" additivity="false">
         <appender-ref ref="STDOUT"/>
-        <appender-ref ref="TIMETRACE"/>
+        <appender-ref ref="ErrorDetail"/>
     </logger>
 
-    <logger name="ParamErrorTrace" levle="WARN" additivity="false">
+    <logger name="event" level="info" additivity="false">
         <appender-ref ref="STDOUT"/>
-        <appender-ref ref="PARAMTRACE"/>
+        <appender-ref ref="event"/>
     </logger>
-
 
     <root level="info">
         <appender-ref ref="STDOUT"/>

@@ -51,6 +51,7 @@ public class JwtFilter extends OncePerRequestFilter {
             } else {
                 filterChain.doFilter(request, response);
             }
+
         } catch (ExpiredJwtException | InvalidTokenException e) {
             request.setAttribute("AuthException", e);
             throw e;

@@ -78,7 +78,6 @@ public class DataPreparation {
      *
      */
     public void init() {
-
         Member memberA = createMember("memberA@email.com", "memberA", "nickA", "1234qwer!@QW");
         Member memberB = createMember("memberB@email.com", "memberB", "nickB", "1234qwer!@QW");
         Member memberC = createMember("memberC@email.com", "memberC", "nickC", "1234qwer!@QW");
@@ -134,7 +133,6 @@ public class DataPreparation {
     }
 
     public void initLogin() {
-
         List<GrantedAuthority> authorities = Collections.singletonList(new SimpleGrantedAuthority(UserRole.USER.getKey()));
         UserPrincipal principal = UserPrincipal.builder().email("memberA@email.com").password("").authorities(authorities).build();
         UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(principal, "", authorities);

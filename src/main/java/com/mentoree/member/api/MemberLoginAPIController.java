@@ -87,7 +87,10 @@ public class MemberLoginAPIController {
         Map<String, String> cookies = Arrays.stream(request.getCookies()).collect(Collectors.toMap(Cookie::getName, Cookie::getValue));
         String accessToken = cookies.get(ACCESS_TOKEN_COOKIE);
 
-        if(!refreshToken.getAccessToken().equals(accessToken)) {
+        String uuidCookie = encryptUtils.decrypt(cookies.get(UUID_COOKIE));
+        String dbUUID = encryptUtils.decrypt(refreshToken.getUuid());
+
+        if(!refreshToken.getAccessToken().equals(accessToken) && dbUUID.equals(uuidCookie)) {
             throw new InvalidTokenException("Refresh token 과 일치하지 않습니다.");
         }
 

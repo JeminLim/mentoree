@@ -1,5 +1,6 @@
 package com.mentoree.global.aop;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mentoree.global.logging.LogTrace;
 import com.mentoree.global.logging.TraceStatus;
 import com.nimbusds.jose.shaded.json.JSONObject;
@@ -35,6 +36,7 @@ import java.util.Map;
 public class LoggingAOP {
 
     private final LogTrace logTrace;
+    private final ObjectMapper objectMapper;
     private Logger log = LoggerFactory.getLogger("event");
 
     @Pointcut("execution(* com.mentoree..*Controller.*(..))")
@@ -59,7 +61,6 @@ public class LoggingAOP {
 
 
         HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
-
         String className = joinPoint.getSignature().getDeclaringType().getSimpleName();
         String methodName = joinPoint.getSignature().getName();
 
@@ -73,7 +74,8 @@ public class LoggingAOP {
         params.put("elapsed_time(ms)", timeElapsed.toMillis());
         params.put("bottleneck", timeElapsed.toSeconds() > 5);
 
-        log.info("[{}] : {}" , currentTrace.getId(), params);
+        String logData = objectMapper.writeValueAsString(params).replaceAll("\\\\", "");
+        log.info("[{}] : {}" , currentTrace.getId(), logData);
 
         logTrace.complete();
         return result;
@@ -102,7 +104,8 @@ public class LoggingAOP {
         params.put("elapsed_time(ms)", timeElapsed.toMillis());
         params.put("bottleneck", timeElapsed.toSeconds() > 5);
 
-        log.info("[{}] : {}" , currentTrace.getId(), params);
+        String logData = objectMapper.writeValueAsString(params).replaceAll("\\\\", "");
+        log.info("[{}] : {}" , currentTrace.getId(), logData);
 
         logTrace.complete();
         return result;
@@ -126,7 +129,7 @@ public class LoggingAOP {
     }
 
 
-    private static JSONObject getParams(HttpServletRequest request) {
+    private static String getParams(HttpServletRequest request) {
         JSONObject jsonObject = new JSONObject();
         Enumeration<String> params = request.getParameterNames();
         while(params.hasMoreElements()) {
@@ -134,7 +137,7 @@ public class LoggingAOP {
             String replaceParam = param.replaceAll("\\.", "-");
             jsonObject.put(replaceParam, request.getParameter(param));
         }
-        return jsonObject;
+        return jsonObject.toJSONString();
     }
 
 

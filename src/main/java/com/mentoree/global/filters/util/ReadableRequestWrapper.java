@@ -1,13 +1,13 @@
 package com.mentoree.global.filters.util;
 
-import com.nimbusds.jose.shaded.json.JSONArray;
 import lombok.extern.slf4j.Slf4j;
-import net.minidev.json.JSONObject;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.entity.ContentType;
-import org.apache.tomcat.util.json.JSONParser;
-import org.apache.tomcat.util.json.ParseException;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 
 import javax.servlet.ReadListener;
 import javax.servlet.ServletInputStream;
@@ -38,19 +38,21 @@ public class ReadableRequestWrapper extends HttpServletRequestWrapper {
             this.rawData = IOUtils.toByteArray(is);
 
             String body = this.getReader().lines().collect(Collectors.joining(System.lineSeparator()));
+
             if(StringUtils.isEmpty(body)) { return;}
             if(request.getContentType() != null && request.getContentType().contains(ContentType.MULTIPART_FORM_DATA.getMimeType())) { return; }
 
-            Object parse = new JSONParser(body).parse();
+            JSONParser jsonParser = new JSONParser();
+            Object parse = jsonParser.parse(body);
             if(parse instanceof JSONArray) {
                 JSONArray jsonArray = (JSONArray) parse;
                 setParameter("requestBody", jsonArray.toJSONString());
             } else {
                 JSONObject jsonObject = (JSONObject) parse;
-                Iterator<String> iterator = jsonObject.keySet().iterator();
+                Iterator iterator = jsonObject.keySet().iterator();
                 while(iterator.hasNext()) {
                     String key = (String)iterator.next();
-                    setParameter(key, String.valueOf(jsonObject.get(key).toString()).replace("\"", "\\\""));
+                    setParameter(key, String.valueOf(jsonObject.get(key)));
                 }
             }
         } catch (IOException | ParseException e) {

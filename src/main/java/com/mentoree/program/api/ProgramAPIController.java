@@ -4,6 +4,8 @@ import com.mentoree.config.security.UserPrincipal;
 import com.mentoree.global.exception.BindingFailureException;
 import com.mentoree.global.exception.NoAuthorityException;
 import com.mentoree.member.domain.Member;
+import com.mentoree.participants.api.dto.ParticipantDTOCollection;
+import com.mentoree.participants.api.dto.ParticipantDTOCollection.Applicant;
 import com.mentoree.participants.api.dto.ParticipantDTOCollection.ApplyRequest;
 import com.mentoree.participants.domain.Participant;
 import com.mentoree.program.domain.Program;
@@ -177,14 +179,14 @@ public class ProgramAPIController {
     //== 프로그램 참가 승인 ==//
     @ApiOperation(value = "프로그램 참가 승인 요청", notes = "프로그램 참가 승인 결과 반환")
     @PostMapping("/{programId}/applicants/accept")
-    public ResponseEntity applicantAccept(@ApiParam(value = "승인 대상자 ID", required = true) @RequestBody Long memberId,
-                                            @ApiParam(value = "관리 프로그램 ID", required = true) @PathVariable("programId") Long programId) {
+    public ResponseEntity applicantAccept(@ApiParam(value = "승인 대상자", required = true) @RequestBody Applicant member,
+                                          @ApiParam(value = "관리 프로그램 ID", required = true) @PathVariable("programId") Long programId) {
         // 요청자 해당 프로그램 호스트 판별
         String loginEmail = ((UserPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getEmail();
         if(!participantRepository.isHost(loginEmail, programId)) {
             throw new NoAuthorityException("프로그램 개최자가 아닙니다");
         }
-        programService.approval(memberId, programId);
+        programService.approval(member.getMemberId(), programId);
 
         Map<String, String> result = new HashMap<>();
         result.put("result", "success");
@@ -195,7 +197,7 @@ public class ProgramAPIController {
     //== 프로그램 참가 거절 ==//
     @ApiOperation(value = "프로그램 참가 거절 요청", notes = "프로그램 참가 거절 결과 반환")
     @PostMapping("/{programId}/applicants/reject")
-    public ResponseEntity applicantReject(@ApiParam(value = "거절 대상자 ID", required = true) @RequestBody Long memberId,
+    public ResponseEntity applicantReject(@ApiParam(value = "거절 대상자", required = true) @RequestBody Applicant member,
                                           @ApiParam(value = "관리 프로그램 ID", required = true) @PathVariable("programId") Long programId) {
         // 요청자 해당 프로그램 호스트 판별
         String loginEmail = ((UserPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getEmail();
@@ -203,7 +205,7 @@ public class ProgramAPIController {
             throw new NoAuthorityException("프로그램 개최자가 아닙니다");
         }
 
-        programService.reject(memberId, programId);
+        programService.reject(member.getMemberId(), programId);
 
         Map<String, String> result = new HashMap<>();
         result.put("result", "success");

@@ -214,13 +214,13 @@ public class ProgramAPITest {
         //given
         Program program = (Program) entity.get("programA");
         Member member = (Member) entity.get("memberC");
-        String requestBody = objectMapper.writeValueAsString(member.getId());
+        Applicant target = new Applicant(member.getId());
+        String requestBody = objectMapper.writeValueAsString(target);
         //when
         ResultActions response = mvc.perform(
                 post("/api/programs/" + program.getId() + "/applicants/accept")
                         .header("user-agent", "mobi")
                         .cookie(accessToken, uuidCookie)
-//                        .param("memberId", member.getId().toString())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestBody)
         );
@@ -235,7 +235,8 @@ public class ProgramAPITest {
         //given
         Program program = (Program) entity.get("programA");
         Member member = (Member) entity.get("memberD");
-        String requestBody = objectMapper.writeValueAsString(member.getId());
+        Applicant target = new Applicant(member.getId());
+        String requestBody = objectMapper.writeValueAsString(target);
         //when
         ResultActions response = mvc.perform(
                 post("/api/programs/" + program.getId() + "/applicants/reject")
@@ -256,7 +257,8 @@ public class ProgramAPITest {
         //given
         Program program = (Program) entity.get("programB");
         Member member = (Member) entity.get("memberA");
-        String requestBody = objectMapper.writeValueAsString(member.getId());
+        Applicant target = new Applicant(member.getId());
+        String requestBody = objectMapper.writeValueAsString(target);
         //when
         ResultActions response = mvc.perform(
                 post("/api/programs/" + program.getId() + "/applicants/accept")

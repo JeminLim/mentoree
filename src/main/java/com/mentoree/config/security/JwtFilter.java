@@ -36,14 +36,12 @@ public class JwtFilter extends OncePerRequestFilter {
             boolean isMatch = false;
             AntPathMatcher pathMatcher = new AntPathMatcher();
             String currentURI = request.getRequestURI();
-
             for (String path : excludePath) {
-                if(pathMatcher.match(currentURI, path)) {
+                if(pathMatcher.match(path, currentURI)) {
                     isMatch = true;
                     break;
                 }
             }
-
             if(!isMatch) {
                 Authentication authentication = jwtUtils.getAuthentication(request);
                 SecurityContextHolder.getContext().setAuthentication(authentication);

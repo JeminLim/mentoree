@@ -3,10 +3,7 @@ package com.mentoree.participants.api.dto;
 import com.mentoree.program.domain.ProgramRole;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import javax.validation.constraints.NotNull;
 
@@ -70,6 +67,19 @@ public class ParticipantDTOCollection {
         @NotNull
         @ApiModelProperty(value = "참가 신청 역할")
         private ProgramRole role;
+    }
+
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @ApiModel(description = "승인 또는 거절 대상 회원 ID")
+    public static class Applicant {
+
+        @NotNull
+        @ApiModelProperty(value = "관리 대상 회원 ID")
+        private Long memberId;
+
     }
 
 }

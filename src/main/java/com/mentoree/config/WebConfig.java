@@ -1,10 +1,14 @@
 package com.mentoree.config;
 
+import com.mentoree.global.filters.ReadableRequestWrapperFilter;
 import com.mentoree.global.interceptors.AuthorityInterceptor;
 import com.mentoree.participants.repository.ParticipantRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
+import org.springframework.web.servlet.config.annotation.PathMatchConfigurer;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
@@ -29,4 +33,13 @@ public class WebConfig implements WebMvcConfigurer {
                 .addResourceLocations("classpath:/META-INF/resources/webjars/");
 
     }
+
+    @Bean
+    public FilterRegistrationBean getFilterRegistrationBean() {
+        FilterRegistrationBean registrationBean = new FilterRegistrationBean(new ReadableRequestWrapperFilter());
+        registrationBean.setOrder(Integer.MIN_VALUE);
+        return registrationBean;
+    }
+
+
 }

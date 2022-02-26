@@ -12,7 +12,4 @@ public class MentoreeApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(MentoreeApplication.class, args);
 	}
-
-
-
 }

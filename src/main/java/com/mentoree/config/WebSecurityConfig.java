@@ -3,6 +3,7 @@ package com.mentoree.config;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mentoree.config.security.CustomAuthenticationEntryPoint;
 import com.mentoree.config.security.util.JwtUtils;
+import com.mentoree.global.filters.ReadableRequestWrapperFilter;
 import com.mentoree.participants.repository.ParticipantRepository;
 import com.mentoree.global.repository.TokenRepository;
 import com.mentoree.config.security.CustomAuthenticationProvider;
@@ -36,6 +37,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
             "/api/members/join",
             "/api/members/join/**",
             "/api/programs/**",
+            "/swagger-ui.html",
             "/swagger-ui.html/**",
             "/swagger-resources/**",
             "/v2/api-docs",

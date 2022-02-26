@@ -19,21 +19,22 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
     private final PasswordEncoder passwordEncoder;
     private final CustomUserDetailService customUserDetailService;
 
-        @Override
-        public Authentication authenticate(Authentication authentication) throws AuthenticationException {
-            String email = (String) authentication.getPrincipal();
-            String password = (String) authentication.getCredentials();
+    @Override
+    public Authentication authenticate(Authentication authentication) throws AuthenticationException {
+        String email = (String) authentication.getPrincipal();
+        String password = (String) authentication.getCredentials();
 
-            UserDetails db = customUserDetailService.loadUserByUsername(email);
+        UserDetails db = customUserDetailService.loadUserByUsername(email);
 
-            if(!passwordEncoder.matches(password, db.getPassword())) {
-                throw new BadCredentialsException("Wrong password");
-            }
-            return new UsernamePasswordAuthenticationToken(db.getUsername(), db.getPassword(), db.getAuthorities());
+        if(!passwordEncoder.matches(password, db.getPassword())) {
+            throw new BadCredentialsException("Wrong password");
         }
 
-        @Override
-        public boolean supports(Class<?> authentication) {
-            return UsernamePasswordAuthenticationToken.class.isAssignableFrom(authentication);
+        return new UsernamePasswordAuthenticationToken(db, db.getPassword(), db.getAuthorities());
+    }
+
+    @Override
+    public boolean supports(Class<?> authentication) {
+        return UsernamePasswordAuthenticationToken.class.isAssignableFrom(authentication);
     }
 }

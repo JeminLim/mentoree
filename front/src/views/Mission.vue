@@ -41,7 +41,7 @@ export default {
         let programId = this.$route.params.programId;
         let loginUserEmail = this.$store.state.user.email;
 
-        axios.get('/program/' + programId + '/info')
+        axios.get('/programs/' + programId)
         .then(res => {
             this.programTitle = res.data.programInfo.title;
             if(res.data.programInfo.mentor != null) {

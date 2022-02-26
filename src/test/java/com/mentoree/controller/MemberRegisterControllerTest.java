@@ -1,9 +1,10 @@
-package com.mentoree.api;
+package com.mentoree.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mentoree.config.WebConfig;
 import com.mentoree.config.WebSecurityConfig;
 import com.mentoree.config.security.JwtFilter;
+import com.mentoree.member.api.MemberProfileAPIController;
 import com.mentoree.member.api.MemberRegisterAPIController;
 import com.mentoree.member.repository.MemberRepository;
 import com.mentoree.member.service.MemberService;
@@ -19,21 +20,22 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
 import static com.mentoree.member.api.dto.MemberDTO.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(
         controllers = MemberRegisterAPIController.class,
-        excludeFilters = {@ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = {WebSecurityConfig.class, WebConfig.class, JwtFilter.class})},
-        excludeAutoConfiguration = {SecurityAutoConfiguration.class, SecurityFilterAutoConfiguration.class,
-                OAuth2ClientAutoConfiguration.class, OAuth2ResourceServerAutoConfiguration.class}
+        excludeFilters = {@ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = {WebSecurityConfig.class, WebConfig.class})},
+        excludeAutoConfiguration = {SecurityAutoConfiguration.class, OAuth2ClientAutoConfiguration.class}
 )
 public class MemberRegisterControllerTest {
 
@@ -57,14 +59,14 @@ public class MemberRegisterControllerTest {
                 .email("test@email.com")
                 .memberName("tester")
                 .nickname("testNick")
-                .password("1234")
+                .password("1234qwer!@QW")
                 .build();
 
         String requestData = objectMapper.writeValueAsString(regForm);
 
         //when
         ResultActions resultActions = mockMvc.perform(
-                post("/api/join")
+                post("/api/members/join")
                         .content(requestData)
                         .contentType(MediaType.APPLICATION_JSON)
         );
@@ -75,13 +77,36 @@ public class MemberRegisterControllerTest {
     }
 
     @Test
+    @DisplayName("회원가입 요청 테스트 실패 컨트롤러 테스트_잘못된 비밀번호 입력 폼")
+    public void joinMemberTest_WrongFormatPW() throws Exception {
+        //given
+        MemberRegistRequest regForm = MemberRegistRequest.builder()
+                .email("test@email.com")
+                .memberName("tester")
+                .nickname("testNick")
+                .password("1234!@QW")
+                .build();
+
+        String requestData = objectMapper.writeValueAsString(regForm);
+
+        //when
+        ResultActions resultActions = mockMvc.perform(
+                post("/api/members/join")
+                        .content(requestData)
+                        .contentType(MediaType.APPLICATION_JSON)
+        );
+        //then
+        resultActions.andExpect(status().isBadRequest());
+    }
+
+    @Test
     @DisplayName("이메일 중복 발생 컨트롤러 테스트")
     public void duplicateEmail() throws Exception {
         //given
         when(memberRepository.existsByEmail(any())).thenReturn(true);
         //when
         ResultActions result = mockMvc.perform(
-                post("/api/join/check/email")
+                post("/api/members/join/email-check")
                         .param("email", "test@email.com")
         );
         //then
@@ -97,7 +122,7 @@ public class MemberRegisterControllerTest {
         when(memberRepository.existsByEmail(any())).thenReturn(false);
         //when
         ResultActions result = mockMvc.perform(
-                post("/api/join/check/email")
+                post("/api/members/join/email-check")
                         .param("email", "test@email.com")
         );
         //then
@@ -113,7 +138,7 @@ public class MemberRegisterControllerTest {
         when(memberRepository.existsByNickname(any())).thenReturn(true);
         //when
         ResultActions result = mockMvc.perform(
-                post("/api/join/check/nickname")
+                post("/api/members/join/nickname-check")
                         .param("nickname", "testerNick")
         );
         //then
@@ -129,7 +154,7 @@ public class MemberRegisterControllerTest {
         when(memberRepository.existsByNickname(any())).thenReturn(false);
         //when
         ResultActions result = mockMvc.perform(
-                post("/api/join/check/nickname")
+                post("/api/members/join/nickname-check")
                         .param("nickname", "testerNick")
         );
         //then

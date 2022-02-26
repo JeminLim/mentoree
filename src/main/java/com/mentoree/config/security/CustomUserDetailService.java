@@ -27,9 +27,7 @@ public class CustomUserDetailService implements UserDetailsService, OAuth2UserSe
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        Member findMember = memberRepository.findByEmail(username).orElseThrow(() -> new UsernameNotFoundException(username + " not found"));
-        UserPrincipal userPrincipal = UserPrincipal.create(findMember);
-        return userPrincipal;
+        return UserPrincipal.create(memberRepository.findByEmail(username).orElseThrow(() -> new UsernameNotFoundException(username + " not found")));
     }
 
     @Override

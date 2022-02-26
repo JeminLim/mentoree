@@ -35,7 +35,6 @@ public class ReplyDTO {
     @ApiModelProperty(value = "댓글 내용")
     private String content;
 
-    @NotNull
     @ApiModelProperty(value = "댓글 작성 및 수정 시간")
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime modifiedDate;

@@ -60,8 +60,7 @@ export default {
                 writerNickname : this.$store.state.user.nickname,
                 content : this.$refs.content.value,
             }
-            const missionId = this.mission.id;
-            axios.post('/board', data)
+            axios.post('/boards/new', data)
             .then(() => {
                 alert("작성 완료 되었습니다");
                 this.$router.push('/mission/' + missionId + '/board');              
@@ -72,7 +71,7 @@ export default {
     },
     created() {
         const missionId = this.$route.params.missionId;
-        axios.get('/mission/' + missionId)
+        axios.get('/missions/' + missionId)
         .then(res => {
             this.mission = res.data.mission;
         })

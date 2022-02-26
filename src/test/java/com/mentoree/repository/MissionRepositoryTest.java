@@ -22,7 +22,6 @@ import java.util.NoSuchElementException;
 import static com.mentoree.mission.api.dto.MissionDTOCollection.*;
 import static org.assertj.core.api.Assertions.*;
 
-@ExtendWith(SpringExtension.class)
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 public class MissionRepositoryTest {
@@ -84,7 +83,7 @@ public class MissionRepositoryTest {
     @Test
     @DisplayName("현재 진행중인 미션 찾기")
     void findCurrentMission() {
-        List<MissionDTO> currentMission = missionRepository.findCurrentMission(testProgram.getId());
+        List<MissionDTO> currentMission = missionRepository.findMissionList(testProgram.getId(), true);
 
         assertThat(currentMission.size()).isEqualTo(1);
         assertThat(currentMission.get(0).getId()).isEqualTo(openMission.getId());
@@ -98,7 +97,7 @@ public class MissionRepositoryTest {
     @Test
     @DisplayName("종료된 미션 찾기")
     void findEndedMission() {
-        List<MissionDTO> endedMission = missionRepository.findEndedMission(testProgram.getId());
+        List<MissionDTO> endedMission = missionRepository.findMissionList(testProgram.getId(), false);
 
         assertThat(endedMission.size()).isEqualTo(1);
         assertThat(endedMission.get(0).getId()).isEqualTo(closeMission.getId());

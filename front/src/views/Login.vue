@@ -57,19 +57,14 @@ export default {
 
             await axios.post('/login/process', form)
             .then(res => {
-                var token = {
-                    accessToken: res.data.accessToken,
-                    refreshToken: res.data.refreshToken
-                }
-                this.$store.dispatch('token/login', token, {root: true});
                 this.$store.dispatch('user/loginUser', res.data.user, {root: true});
                 this.$router.push('/');
             }).catch(error => {
                 console.log(error);
-                // if(error.response.status == 401){
-                //     this.loginFail = true;
-                //     this.errorMessage = '아이디 또는 비밀번호가 틀립니다.'
-                // }
+                if(error.response.data.status == 401){
+                    this.loginFail = true;
+                    this.errorMessage = '아이디 또는 비밀번호가 틀립니다.'
+                }
             });
         }
     }

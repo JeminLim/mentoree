@@ -27,7 +27,6 @@ import java.util.NoSuchElementException;
 import static com.mentoree.board.api.dto.BoardDTO.*;
 import static org.assertj.core.api.Assertions.*;
 
-@ExtendWith(SpringExtension.class)
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 public class BoardRepositoryTest {

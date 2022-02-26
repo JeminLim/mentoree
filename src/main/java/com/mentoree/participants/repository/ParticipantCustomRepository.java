@@ -16,6 +16,14 @@ public interface ParticipantCustomRepository {
     Optional<Participant> findHost(Long programId);
     Long countCurrentMember(Long programId);
     Boolean isApplicants(Long programId, Long memberId);
+    boolean isHost(String email, Long programId);
+
+    boolean isMentor(String email, Long programId);
+
+    boolean isParticipantByEmailAndMissionId(String email, Long missionId);
+    boolean isParticipantByEmailAndBoardId(String email, Long boardId);
+    boolean isParticipantByEmailAndProgramId(String email, Long programId);
+
 
 
 }

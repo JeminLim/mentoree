@@ -61,9 +61,9 @@ export default {
         }
     },
     beforeMount() {
-        var programId = this.$route.params.programId;
-
-        axios.get('/program/' + programId + '/mission/open')
+        var data = { programId : this.$route.params.programid}
+        
+        axios.get('/missions/list', data)
         .then(res => {
             res.data.missions.forEach(mission => this.missions.push(mission));
         }).catch(err => {

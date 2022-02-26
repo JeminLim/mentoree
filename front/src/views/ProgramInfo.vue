@@ -125,7 +125,7 @@ export default {
                 role: this.$refs.role.value,
             }
 
-            axios.post('/program/' + this.program.id + '/join', data)
+            axios.post('/programs/' + this.program.id + '/join', data)
             .then(res => {
                 if(res.data.result == 'success') {
                     alert("신청 완료되었습니다.");
@@ -150,7 +150,7 @@ export default {
     beforeMount() {
         var programId = this.$route.params.programId;
 
-        axios.get('/program/' + programId + '/info')
+        axios.get('/programs/' + programId)
         .then(res => {
             this.program = res.data.programInfo;
             this.isHost = res.data.isHost;

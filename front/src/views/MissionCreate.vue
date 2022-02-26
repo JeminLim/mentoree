@@ -68,9 +68,9 @@ export default {
                 title: this.$refs.title.value,
                 goal: this.$refs.goal.value,
                 content: this.$refs.content.value,
-                dueDate: this.datePick
+                dueDate: this.datePick 
             }
-            axios.post('/mission', data)
+            axios.post('/missions/new', data)
             .then(() => {
                 alert("미션이 등록되었습니다.")
                 this.$router.push('/program/' + programId + '/mission')

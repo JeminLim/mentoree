@@ -1,12 +1,12 @@
 package com.mentoree.participants.domain;
 
 import com.mentoree.global.domain.BaseTimeEntity;
-import com.mentoree.global.exception.ClosedProgramException;
 import com.mentoree.member.domain.Member;
 import com.mentoree.program.domain.Program;
 import com.mentoree.program.domain.ProgramRole;
 import lombok.*;
 import org.springframework.util.Assert;
+import org.springframework.web.server.MethodNotAllowedException;
 
 import javax.persistence.*;
 
@@ -68,7 +68,7 @@ public class Participant extends BaseTimeEntity {
             approval = true;
             program.addParticipant();
         } else {
-            throw new ClosedProgramException("Program had been closed");
+            throw new IllegalStateException("Program had been closed");
         }
     }
 

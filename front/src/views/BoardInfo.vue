@@ -37,7 +37,7 @@ export default {
     beforeMount() {
         let boardId = this.$route.params.boardId;
 
-        axios.get('/board/' + boardId + '/info')
+        axios.get('/boards/' + boardId)
         .then(res => {
             this.boardInfo = res.data.boardInfo;
         }).catch(err => {

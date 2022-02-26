@@ -1,6 +1,7 @@
 package com.mentoree.member.service;
 
 import com.mentoree.category.repository.CategoryRepository;
+import com.mentoree.global.exception.DuplicateExistException;
 import com.mentoree.member.repository.MemberInterestRepository;
 import com.mentoree.member.repository.MemberRepository;
 import com.mentoree.category.domain.Category;
@@ -30,7 +31,13 @@ public class MemberService {
     //== 회원가입 ==//
     @Transactional
     public Member join(MemberRegistRequest request) {
-        return memberRepository.save(request.toEntity(passwordEncoder, UserRole.USER));
+        Member requestMember = request.toEntity(passwordEncoder, UserRole.USER);
+
+        if(memberRepository.existsByEmail(requestMember.getEmail()) || memberRepository.existsByNickname(requestMember.getNickname())) {
+            throw new DuplicateExistException(Member.class, "Member already exist");
+        }
+
+        return memberRepository.save(requestMember);
     }
 
     //== 회원 정보 변경 ==//

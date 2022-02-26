@@ -1,11 +1,17 @@
 package com.mentoree.member.api;
 
+import com.mentoree.config.security.UserPrincipal;
+import com.mentoree.config.security.util.AESUtils;
+import com.mentoree.config.security.util.EncryptUtils;
 import com.mentoree.config.security.util.JwtUtils;
+import com.mentoree.config.security.util.SecurityConstant;
 import com.mentoree.global.domain.RefreshToken;
+import com.mentoree.global.exception.InvalidTokenException;
+import com.mentoree.global.exception.NoAuthorityException;
 import com.mentoree.member.repository.MemberRepository;
 import com.mentoree.participants.repository.ParticipantRepository;
 import com.mentoree.global.repository.TokenRepository;
-import com.mentoree.member.api.dto.MemberDTO;
+import com.mentoree.program.api.dto.ProgramDTO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
@@ -15,14 +21,18 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.util.*;
+import java.util.stream.Collectors;
 
+import static com.mentoree.config.security.util.SecurityConstant.*;
 import static com.mentoree.program.api.dto.ProgramDTO.*;
+
 
 @Slf4j
 @RestController
@@ -32,43 +42,32 @@ import static com.mentoree.program.api.dto.ProgramDTO.*;
 public class MemberLoginAPIController {
 
     private final JwtUtils jwtUtils;
-    private final ParticipantRepository participantRepository;
-    private final MemberRepository memberRepository;
+    private final EncryptUtils encryptUtils;
     private final TokenRepository tokenRepository;
 
     //== 로그인 ==//
     @ApiOperation(value = "회원 로그인 성공 후 로직", hidden = true)
     @PostMapping("/login/success")
-    public ResponseEntity loginSuccess() {
-        log.info("login success ... " );
+    public ResponseEntity loginSuccess(HttpServletRequest request, HttpServletResponse response) {
+        // UUID + IP -> IUWT 발급 + refreshToken 저장
+        String encryptedUUID = encryptUtils.encrypt(UUID.randomUUID().toString());
+        String encryptedIP = encryptUtils.encrypt(request.getRemoteAddr());
+        String accessToken = jwtUtils.generateAccessToken(encryptedUUID, encryptedIP);
 
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        log.info("authentication principal={} ", authentication.getPrincipal());
-        String accessToken = jwtUtils.generateAccessToken(authentication);
-        String refreshToken = jwtUtils.generateRefreshToken(authentication);
+        // 토큰 및 UUID 쿠키 저장
+        setCookie(response, ACCESS_TOKEN_COOKIE, accessToken, REFRESH_VALID_TIME);
+        setCookie(response, UUID_COOKIE, encryptedUUID, REFRESH_VALID_TIME);
 
-        String email = "";
-        if(authentication instanceof OAuth2AuthenticationToken) {
-            email = (String) ((OAuth2AuthenticationToken) authentication).getPrincipal().getAttributes().get("email");;
-        }
-        else if(authentication instanceof UsernamePasswordAuthenticationToken ) {
-            UserDetails principal = (UserDetails) authentication.getPrincipal();
-            email = principal.getUsername();
-        }
+        //refresh token 저장
+        String email = ((UserPrincipal)SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getEmail(); // 아마 Oauth2 로그인에서 문제가 생길수도
+        RefreshToken refreshToken = RefreshToken.builder().uuid(encryptedUUID).accessToken(accessToken).email(email).build();
+        tokenRepository.save(refreshToken);
 
-        RefreshToken toDB = RefreshToken.builder().email(email).refreshToken(refreshToken).build();
-        tokenRepository.save(toDB);
-
-        MemberDTO.MemberInfo loginMemberInfo = memberRepository.findMemberInfoByEmail(email).orElseThrow(NoSuchElementException::new);
-        List<ParticipatedProgramDTO> participateProgram = participantRepository.findParticipateProgram(email);
-        loginMemberInfo.setParticipatedPrograms(participateProgram);
-
-        Map<String, Object> data = new HashMap<>();
-        data.put("user", loginMemberInfo);
-        data.put("accessToken", accessToken);
-        data.put("refreshToken", refreshToken);
-        return ResponseEntity.ok().body(data);
+        Map<String, String> result = new HashMap<>();
+        result.put("result", "success");
+        return ResponseEntity.ok().body(result);
     }
+
 
     @ApiOperation(value = "회원 로그인 실패 후 로직", hidden = true)
     @PostMapping("/login/fail")
@@ -79,21 +78,45 @@ public class MemberLoginAPIController {
     //== 토큰 재발급 ==//
     @ApiOperation(value = "액세스 토큰 재발급", notes = "토큰 검증 후, 재발급 액세스 토큰 반환")
     @PostMapping("/reissue")
-    public ResponseEntity publishRefreshToken(@RequestBody Map<String, String> token) {
-        String refreshToken = token.get("refreshToken");
-        String loginEmail = jwtUtils.getEmail(refreshToken);
-        log.info("loginEmail = " + loginEmail);
+    public ResponseEntity reissueToken(HttpServletRequest request, HttpServletResponse response) {
 
-        RefreshToken tokenFromDB = tokenRepository.findByEmail(loginEmail).orElseThrow(NoSuchElementException::new);
-        log.info("tokenFromDB = " + tokenFromDB.getRefreshToken());
-        if(refreshToken.equals(tokenFromDB.getRefreshToken()) && jwtUtils.isValidToken(refreshToken)) {
-            log.info("valid");
-            String newAccessToken = jwtUtils.generateAccessToken(jwtUtils.getAuthentication(refreshToken));
-            return ResponseEntity.ok().body(newAccessToken);
-        } else {
-            log.info("invalid");
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid Token");
+        //== DB 토큰과 검증 ==//
+        String email = ((UserPrincipal)SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getEmail();
+        RefreshToken refreshToken = tokenRepository.findByEmail(email).orElseThrow(NoSuchElementException::new);
+
+        Map<String, String> cookies = Arrays.stream(request.getCookies()).collect(Collectors.toMap(Cookie::getName, Cookie::getValue));
+        String accessToken = cookies.get(ACCESS_TOKEN_COOKIE);
+
+        String uuidCookie = encryptUtils.decrypt(cookies.get(UUID_COOKIE));
+        String dbUUID = encryptUtils.decrypt(refreshToken.getUuid());
+
+        if(!refreshToken.getAccessToken().equals(accessToken) && dbUUID.equals(uuidCookie)) {
+            throw new InvalidTokenException("Refresh token 과 일치하지 않습니다.");
         }
+
+        //토큰 갱신
+        String encryptedUUID = encryptUtils.encrypt(UUID.randomUUID().toString());
+        String encryptedIP = encryptUtils.encrypt(request.getRemoteAddr());
+        String newToken = jwtUtils.generateAccessToken(encryptedUUID, encryptedIP);
+
+        // 토큰 및 UUID 쿠키 저장
+        setCookie(response, ACCESS_TOKEN_COOKIE, newToken, REFRESH_VALID_TIME);
+        setCookie(response, UUID_COOKIE, encryptedUUID, REFRESH_VALID_TIME);
+
+        //refreshToken 갱신
+        refreshToken.updateRefreshToken(encryptedUUID, newToken);
+
+        Map<String, String> result = new HashMap<>();
+        result.put("result", "success");
+        return ResponseEntity.ok().body(result);
+    }
+
+    private void setCookie(HttpServletResponse response, String name, String value, int validationTime) {
+        Cookie cookie = new Cookie(name, value);
+        cookie.setPath("/");
+        cookie.setMaxAge(validationTime);
+        cookie.setHttpOnly(true);
+        response.addCookie(cookie);
     }
 
 

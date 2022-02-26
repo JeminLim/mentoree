@@ -1,4 +1,4 @@
-package com.mentoree.api;
+package com.mentoree.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mentoree.category.domain.Category;
@@ -7,6 +7,7 @@ import com.mentoree.config.WebSecurityConfig;
 import com.mentoree.config.security.JwtFilter;
 import com.mentoree.member.domain.Member;
 import com.mentoree.member.repository.MemberRepository;
+import com.mentoree.mock.WithCustomMockUser;
 import com.mentoree.participants.domain.Participant;
 import com.mentoree.participants.repository.ParticipantRepository;
 import com.mentoree.program.api.ProgramAPIController;
@@ -33,6 +34,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
@@ -47,6 +49,7 @@ import static com.mentoree.program.api.dto.ProgramDTO.*;
 import static com.mentoree.program.api.dto.ProgramRequestDTO.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -54,9 +57,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(
         controllers = ProgramAPIController.class,
-        excludeFilters = {@ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = {WebSecurityConfig.class, WebConfig.class, JwtFilter.class})},
-        excludeAutoConfiguration = {SecurityAutoConfiguration.class, SecurityFilterAutoConfiguration.class,
-                OAuth2ClientAutoConfiguration.class, OAuth2ResourceServerAutoConfiguration.class}
+        excludeFilters = {@ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = {WebSecurityConfig.class, WebConfig.class})}
 )
 public class ProgramControllerTest {
     @MockBean
@@ -84,13 +85,6 @@ public class ProgramControllerTest {
 
     @BeforeEach
     void setUp() {
-        UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken("test@email.com", "",
-                Collections.singletonList(new SimpleGrantedAuthority("USER")));
-
-        SecurityContext context = SecurityContextHolder.getContext();
-        context.setAuthentication(authentication);
-
-
         member = Member.builder().email("test@email.com").memberName("tester").nickname("testNick").userPassword("1234").build();
         category = Category.builder().categoryName("testCategory").build();
         program = Program.builder().programName("testProgram").maxMember(5).goal("testGoal").dueDate(LocalDate.now()).description("testDesc").category(category).build();
@@ -101,6 +95,7 @@ public class ProgramControllerTest {
     }
 
     @Test
+    @WithCustomMockUser
     @DisplayName("프로그램 생성 컨트롤러 테스트")
     public void createProgramTest() throws Exception {
         //given
@@ -120,7 +115,8 @@ public class ProgramControllerTest {
         String requestBody = objectMapper.writeValueAsString(requestData);
         //when
         ResultActions result = mockMvc.perform(
-                post("/api/program/create")
+                post("/api/programs/new")
+                        .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestBody)
         );
@@ -130,6 +126,7 @@ public class ProgramControllerTest {
     }
 
     @Test
+    @WithCustomMockUser
     @DisplayName("프로그램 리스트 불러오기 컨트롤러 테스트")
     public void getMoreListTest() throws Exception {
         //given
@@ -143,7 +140,8 @@ public class ProgramControllerTest {
         String requestBody = objectMapper.writeValueAsString(programRequest);
         //when
         ResultActions response = mockMvc.perform(
-                post("/api/program/list")
+                post("/api/programs/list")
+                        .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestBody));
         //then
@@ -158,6 +156,7 @@ public class ProgramControllerTest {
 
 
     @Test
+    @WithCustomMockUser
     @DisplayName("추천 프로그램 리스트 불러오기 컨트롤러 테스트")
     public void getMoreRecommendListTest() throws Exception {
         //given
@@ -175,7 +174,8 @@ public class ProgramControllerTest {
         String requestBody = objectMapper.writeValueAsString(recommendProgramRequest);
         //when
         ResultActions response = mockMvc.perform(
-                post("/api/program/recommend/list")
+                post("/api/programs/list/recommend")
+                        .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestBody)
         );
@@ -188,6 +188,7 @@ public class ProgramControllerTest {
     }
 
     @Test
+    @WithCustomMockUser
     @DisplayName("프로그램 정보 받기 테스트 컨트롤러 테스트")
     public void programInfoGetTest() throws Exception {
         //given
@@ -197,7 +198,7 @@ public class ProgramControllerTest {
 
         //when
         ResultActions response = mockMvc.perform(
-                get("/api/program/1/info")
+                get("/api/programs/1")
         );
         //then
         response.andExpect(status().isOk())
@@ -207,6 +208,7 @@ public class ProgramControllerTest {
     }
 
     @Test
+    @WithCustomMockUser
     @DisplayName("프로그램 참가 첫 신청 컨트롤러 테스트")
     public void applyProgramTest() throws Exception {
         //given
@@ -221,7 +223,8 @@ public class ProgramControllerTest {
         when(programService.applyProgram(any(), any(), any(), any())).thenReturn(true);
         //when
         ResultActions response = mockMvc.perform(
-                post("/api/program/1/join")
+                post("/api/programs/1/join")
+                        .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestBody)
         );
@@ -231,6 +234,7 @@ public class ProgramControllerTest {
     }
 
     @Test
+    @WithCustomMockUser
     @DisplayName("프로그램 참가 중복 신청 컨트롤러 테스트")
     public void applyProgramMoreThanTwiceTest() throws Exception {
         //given
@@ -241,7 +245,8 @@ public class ProgramControllerTest {
         when(programService.applyProgram(any(), any(), any(), any())).thenReturn(false);
         //when
         ResultActions response = mockMvc.perform(
-                post("/api/program/1/join")
+                post("/api/programs/1/join")
+                        .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestBody)
         );
@@ -251,6 +256,7 @@ public class ProgramControllerTest {
     }
 
     @Test
+    @WithCustomMockUser
     @DisplayName("프로그램 참가자 신청 리스트 컨트롤러 테스트")
     public void programApplicationListGetTest() throws Exception {
         //given
@@ -262,9 +268,10 @@ public class ProgramControllerTest {
         when(programRepository.findProgramById(any())).thenReturn(Optional.of(programInfo));
         when(participantRepository.findAllApplicants(any())).thenReturn(applyRequestList);
         when(participantRepository.countCurrentMember(any())).thenReturn(5L);
+        when(participantRepository.isHost(any(), any())).thenReturn(true);
         //when
         ResultActions response = mockMvc.perform(
-                get("/api/program/1/applicants")
+                get("/api/programs/1/applicants")
         );
         //then
         response.andExpect(status().isOk())
@@ -274,13 +281,17 @@ public class ProgramControllerTest {
     }
 
     @Test
+    @WithCustomMockUser
     @DisplayName("프로그램 참가 승인 컨트롤러 테스트")
     public void applicantTest() throws Exception {
         //given
+        when(participantRepository.isHost(any(), any())).thenReturn(true);
         //when
         ResultActions response = mockMvc.perform(
-                post("/api/program/1/applicants/accept")
-                        .param("memberId", "1")
+                post("/api/programs/1/applicants/accept")
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("1")
         );
         //then
         response.andExpect(status().isOk())
@@ -289,19 +300,24 @@ public class ProgramControllerTest {
     }
 
     @Test
+    @WithCustomMockUser
     @DisplayName("프로그램 참가 거절 컨트롤러 테스트")
     public void applicantRejectTest() throws Exception {
         //given
+        when(participantRepository.isHost(any(), any())).thenReturn(true);
         //when
         ResultActions response = mockMvc.perform(
-                post("/api/program/1/applicants/reject")
-                        .param("memberId", "1")
+                post("/api/programs/1/applicants/reject")
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("1")
         );
         //then
         response.andExpect(status().isOk())
                 .andExpect(jsonPath("$.result").value("success"));
         verify(programService, times(1)).reject(any(), any());
     }
+
     private ApplyRequest createApplyRequest(Long id, String message, String nickname, ProgramRole role) {
         ApplyRequest result = new ApplyRequest();
         result.setProgramId(id);

@@ -1,4 +1,4 @@
-package com.mentoree.api;
+package com.mentoree.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mentoree.board.domain.Board;
@@ -8,9 +8,12 @@ import com.mentoree.config.WebConfig;
 import com.mentoree.config.WebSecurityConfig;
 import com.mentoree.config.security.JwtFilter;
 import com.mentoree.global.repository.ReplyRepository;
+import com.mentoree.member.api.MemberProfileAPIController;
 import com.mentoree.member.domain.Member;
 import com.mentoree.member.repository.MemberRepository;
 import com.mentoree.mission.domain.Mission;
+import com.mentoree.mock.WithCustomMockUser;
+import com.mentoree.participants.repository.ParticipantRepository;
 import com.mentoree.program.domain.Program;
 import com.mentoree.reply.api.ReplyAPIController;
 import com.mentoree.reply.api.dto.ReplyDTO;
@@ -22,6 +25,7 @@ import org.springframework.boot.autoconfigure.security.oauth2.client.servlet.OAu
 import org.springframework.boot.autoconfigure.security.oauth2.resource.servlet.OAuth2ResourceServerAutoConfiguration;
 import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
 import org.springframework.boot.autoconfigure.security.servlet.SecurityFilterAutoConfiguration;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.ComponentScan;
@@ -42,6 +46,7 @@ import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -50,9 +55,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(
         controllers = ReplyAPIController.class,
-        excludeFilters = {@ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = {WebSecurityConfig.class, WebConfig.class, JwtFilter.class})},
-        excludeAutoConfiguration = {SecurityAutoConfiguration.class, SecurityFilterAutoConfiguration.class,
-                OAuth2ClientAutoConfiguration.class, OAuth2ResourceServerAutoConfiguration.class}
+        excludeFilters = {@ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = {WebSecurityConfig.class, WebConfig.class})}
 )
 public class ReplyControllerTest {
 
@@ -62,6 +65,8 @@ public class ReplyControllerTest {
     MemberRepository memberRepository;
     @MockBean
     BoardRepository boardRepository;
+    @MockBean
+    ParticipantRepository participantRepository;
 
     @Autowired
     ObjectMapper objectMapper;
@@ -74,11 +79,6 @@ public class ReplyControllerTest {
     private ReplyDTO replyDTO;
     @BeforeEach
     void setUp() {
-        UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken("test@email.com", "",
-                Collections.singletonList(new SimpleGrantedAuthority("USER")));
-
-        SecurityContext context = SecurityContextHolder.getContext();
-        context.setAuthentication(authentication);
         member = Member.builder().email("test@email.com").memberName("tester").nickname("testNick").userPassword("1234").build();
 
         Category category = Category.builder().categoryName("testCategory").build();
@@ -90,6 +90,7 @@ public class ReplyControllerTest {
     }
 
     @Test
+    @WithCustomMockUser
     @DisplayName("댓글 리스트 받아오기 테스트")
     public void getRepliesTest() throws Exception {
         //given
@@ -98,7 +99,8 @@ public class ReplyControllerTest {
         when(replyRepository.findRepliesAllByBoard(any())).thenReturn(replyList);
         //when
         ResultActions response = mockMvc.perform(
-                get("/api/board/1/reply")
+                get("/api/replies/list")
+                .param("boardId", "1")
         );
         //then
         response.andExpect(status().isOk())
@@ -106,16 +108,19 @@ public class ReplyControllerTest {
     }
 
     @Test
+    @WithCustomMockUser
     @DisplayName("댓글 작성 테스트")
     public void replyWriteTest() throws Exception {
         //given
         when(memberRepository.findByEmail(any())).thenReturn(Optional.of(member));
         when(boardRepository.findById(any())).thenReturn(Optional.of(board));
         when(replyRepository.save(any())).thenReturn(replyDTO.toEntity(board, member));
+        when(participantRepository.isParticipantByEmailAndBoardId(any(), any())).thenReturn(true);
         String requestBody = objectMapper.writeValueAsString(replyDTO);
         //when
         ResultActions response = mockMvc.perform(
-                post("/api/reply")
+                post("/api/replies/new")
+                        .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestBody)
         );

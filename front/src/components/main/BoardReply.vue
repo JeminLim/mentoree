@@ -43,7 +43,7 @@ export default {
                 content: this.$refs.content.value
             };
 
-            axios.post('/reply', data)
+            axios.post('/replies/new', data)
             .then(res => {
                 if(res.status == 200) {
                     this.replyList.push(res.data);
@@ -61,9 +61,8 @@ export default {
         }
     },
     created() {
-        let boardId = this.$route.params.boardId;
-
-        axios.get('/board/' + boardId + '/reply')
+        const data = { boardId : this.$route.params.boardId }
+        axios.get('/replies/list', data)
         .then(res => {
             res.data.forEach(reply => this.replyList.push(reply));
         }).catch(err => {

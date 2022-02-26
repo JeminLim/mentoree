@@ -17,7 +17,6 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.*;
 
-@ExtendWith(SpringExtension.class)
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 public class CategoryRepositoryTest {

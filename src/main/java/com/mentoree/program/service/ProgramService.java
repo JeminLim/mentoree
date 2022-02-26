@@ -1,6 +1,7 @@
 package com.mentoree.program.service;
 
 import com.mentoree.category.domain.Category;
+import com.mentoree.global.exception.DuplicateExistException;
 import com.mentoree.member.domain.Member;
 import com.mentoree.category.repository.CategoryRepository;
 import com.mentoree.member.repository.MemberRepository;
@@ -32,6 +33,10 @@ public class ProgramService {
      */
     @Transactional
     public Program createProgram(ProgramCreateDTO createDTO, Member login) {
+
+        if(programRepository.existsByTitle(createDTO.getProgramName())) {
+            throw new DuplicateExistException(Program.class, "Duplicate program title already exists");
+        }
 
         Category category = categoryRepository.findByCategoryName(createDTO.getCategory()).orElseThrow(NoSuchElementException::new);
         Program program = programRepository.save(createDTO.toEntity(category));

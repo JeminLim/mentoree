@@ -16,7 +16,7 @@
                             </template>
                             <b-dropdown-item href="#" @click="goToProfile()">내 프로필</b-dropdown-item>
                             <hr>
-                            <b-dropdown-item href="/logout">로그아웃</b-dropdown-item>
+                            <b-dropdown-item @click="logout()">로그아웃</b-dropdown-item>
                         </b-nav-item-dropdown>
                     </b-navbar-nav>
                 </div>
@@ -35,7 +35,6 @@ export default {
     },
     methods: {
         logout() {
-            this.$store.dispatch('logout').token;
             this.$store.dispatch('logout').user;
             axios.post('/logout');
         },

@@ -49,6 +49,14 @@ const user = {
             commit('update', params);
          }
     },
+    getters: {
+        GET_LOGIN_USER: function(state) {
+            return state.email;
+        },
+        GET_PARTICIPATE_PROGRAM: function(state) {
+            return state.participatedPrograms;
+        }
+    }
 }
 
 export default user;

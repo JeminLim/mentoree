@@ -61,8 +61,9 @@ export default {
         }
     },
     created() {
-        const data = { boardId : this.$route.params.boardId }
-        axios.get('/replies/list', data)
+        axios.get('/replies/list', { params:{
+            boardId : this.$route.params.boardId
+        }})
         .then(res => {
             res.data.forEach(reply => this.replyList.push(reply));
         }).catch(err => {

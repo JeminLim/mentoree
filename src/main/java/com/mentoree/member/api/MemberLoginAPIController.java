@@ -8,6 +8,7 @@ import com.mentoree.config.security.util.SecurityConstant;
 import com.mentoree.global.domain.RefreshToken;
 import com.mentoree.global.exception.InvalidTokenException;
 import com.mentoree.global.exception.NoAuthorityException;
+import com.mentoree.member.api.dto.MemberDTO;
 import com.mentoree.member.repository.MemberRepository;
 import com.mentoree.participants.repository.ParticipantRepository;
 import com.mentoree.global.repository.TokenRepository;
@@ -31,6 +32,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.mentoree.config.security.util.SecurityConstant.*;
+import static com.mentoree.member.api.dto.MemberDTO.*;
 import static com.mentoree.program.api.dto.ProgramDTO.*;
 
 
@@ -44,6 +46,8 @@ public class MemberLoginAPIController {
     private final JwtUtils jwtUtils;
     private final EncryptUtils encryptUtils;
     private final TokenRepository tokenRepository;
+    private final MemberRepository memberRepository;
+    private final ParticipantRepository participantRepository;
 
     //== 로그인 ==//
     @ApiOperation(value = "회원 로그인 성공 후 로직", hidden = true)
@@ -59,12 +63,17 @@ public class MemberLoginAPIController {
         setCookie(response, UUID_COOKIE, encryptedUUID, REFRESH_VALID_TIME);
 
         //refresh token 저장
-        String email = ((UserPrincipal)SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getEmail(); // 아마 Oauth2 로그인에서 문제가 생길수도
+        String email = ((UserPrincipal)SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getEmail();
         RefreshToken refreshToken = RefreshToken.builder().uuid(encryptedUUID).accessToken(accessToken).email(email).build();
         tokenRepository.save(refreshToken);
 
-        Map<String, String> result = new HashMap<>();
+        MemberInfo memberInfo = memberRepository.findMemberInfoByEmail(email).orElseThrow(NoSuchElementException::new);
+        List<ParticipatedProgramDTO> participateProgram = participantRepository.findParticipateProgram(email);
+        memberInfo.setParticipatedPrograms(participateProgram);
+
+        Map<String, Object> result = new HashMap<>();
         result.put("result", "success");
+        result.put("user", memberInfo);
         return ResponseEntity.ok().body(result);
     }
 
@@ -73,6 +82,16 @@ public class MemberLoginAPIController {
     @PostMapping("/login/fail")
     public ResponseEntity loginFail() {
         throw new BadCredentialsException("아이디 또는 비밀번호 오류");
+    }
+
+    @ApiOperation(value = "로그아웃 로직", hidden = true)
+    @GetMapping("/logout/success")
+    public ResponseEntity logout(HttpServletResponse response) {
+        setCookie(response, ACCESS_TOKEN_COOKIE, "", 0);
+        setCookie(response, UUID_COOKIE, "", 0);
+        Map<String, Object> result = new HashMap<>();
+        result.put("result", "success");
+        return ResponseEntity.ok().body(result);
     }
 
     //== 토큰 재발급 ==//

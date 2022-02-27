@@ -87,8 +87,8 @@ export default {
     },
     methods: {
         duplicateCheckEmail() {
-            data = { email : this.$refs.email.value};
-            axios.post('/members/join/email-check', data)
+            var sendData = { email : this.$refs.email.value};
+            axios.post('/members/join/email-check', sendData)
             .then(res => { 
                 this.duplicateEmail = res.data;
                 if(this.duplicateEmail) {
@@ -99,8 +99,8 @@ export default {
             })
         },
         duplicateCheckNickname() {
-            data = { email : this.$refs.nickname.value};
-            axios.post('/members/join/nickname-check', data)
+            var sendData = { email : this.$refs.nickname.value};
+            axios.post('/members/join/nickname-check', sendData)
             .then(res =>{
                 this.duplicateNickname = res.data;
                 if(this.duplicateNickname) {

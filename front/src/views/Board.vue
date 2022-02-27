@@ -75,7 +75,7 @@ export default {
     beforeMount() {
         let missionId = this.$route.params.missionId;
 
-        axios.get('/programs/' + programId + '/missions/' + missionId)
+        axios.get('/missions/' + missionId)
         .then(res => {
             this.mission = res.data.mission;
             res.data.boardList.forEach(board => this.boardList.push(board));

@@ -1,7 +1,10 @@
 import axios from "axios";
 
+axios.defaults.baseURL = '/api';
+
+
 const instance = axios.create({
-    baseURL: '/api',
+    // baseURL: '/api',
     timeout: 5000
 })
 
@@ -34,9 +37,9 @@ instance.interceptors.response.use(
             }
             //재발급 요청
             else if(error.response.data.code == 'U004') {
-                await axios.post("/api/reissue")
+                axios.post("/api/reissue")
                 .then(() => {
-                   await axios.request(config);
+                   axios.request(config);
                 });
             }
             else {

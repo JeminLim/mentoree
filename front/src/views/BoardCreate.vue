@@ -63,7 +63,7 @@ export default {
             axios.post('/boards/new', data)
             .then(() => {
                 alert("작성 완료 되었습니다");
-                this.$router.push('/mission/' + missionId + '/board');              
+                this.$router.push('/mission/' + data.missionId + '/board');              
             }).catch(err => {
                 console.log(err);
             })

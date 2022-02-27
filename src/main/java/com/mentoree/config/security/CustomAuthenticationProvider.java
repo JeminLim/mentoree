@@ -25,7 +25,6 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
         String password = (String) authentication.getCredentials();
 
         UserDetails db = customUserDetailService.loadUserByUsername(email);
-
         if(!passwordEncoder.matches(password, db.getPassword())) {
             throw new BadCredentialsException("Wrong password");
         }

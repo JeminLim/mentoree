@@ -77,15 +77,15 @@ export default {
             this.interests = this.$store.state.user.interests;
             this.link = this.$store.state.user.link;
         } else {
-            let param = { email : this.$route.params.email}
-            axios.get('/members/profile', param)
+            axios.get('/members/profile',  { params:{
+                email : this.$route.params.email
+            }})
             .then(res => {
                 this.email = res.data.email;
                 this.memberName = res.data.memberName;
                 this.nickname = res.data.nickname;
                 this.interests = res.data.interests;
                 this.link = res.data.link;
-                console.log(this.memberName);
             }).catch( err => {
                 console.log(err);
             });

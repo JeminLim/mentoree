@@ -146,6 +146,7 @@ public class ParticipantCustomRepositoryImpl implements ParticipantCustomReposit
     public boolean isParticipantByEmailAndBoardId(String email, Long boardId) {
         Board targetBoard = queryFactory.selectFrom(board)
                 .join(board.mission, mission)
+                .fetchJoin()
                 .where(board.id.eq(boardId)).fetchOne();
 
         Long programId = targetBoard.getMission().getProgram().getId();

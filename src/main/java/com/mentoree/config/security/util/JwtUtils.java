@@ -2,6 +2,8 @@ package com.mentoree.config.security.util;
 
 import com.mentoree.config.security.UserPrincipal;
 import com.mentoree.global.exception.InvalidTokenException;
+import com.mentoree.participants.repository.ParticipantRepository;
+import com.mentoree.program.api.dto.ProgramDTO;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
@@ -18,12 +20,14 @@ import org.springframework.stereotype.Component;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
+import java.nio.charset.StandardCharsets;
 import java.security.Key;
 import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.mentoree.config.security.util.SecurityConstant.*;
 import static com.mentoree.config.security.util.SecurityConstant.ACCESS_VALIDATION_TIME;
+import static com.mentoree.program.api.dto.ProgramDTO.*;
 
 
 @Slf4j
@@ -36,11 +40,11 @@ public class JwtUtils {
 
     private static final String IS_MOBILE = "MOBI";
     private final EncryptUtils encryptUtils;
+    private final ParticipantRepository participantRepository;
 
 
     public Authentication getAuthentication(HttpServletRequest request) {
         try {
-
             Map<String, String> cookies = Arrays.stream(request.getCookies()).collect(Collectors.toMap(Cookie::getName, Cookie::getValue));
             String accessToken = cookies.get(ACCESS_TOKEN_COOKIE);
 
@@ -101,7 +105,8 @@ public class JwtUtils {
     }
 
    private Key getKey() {
-        byte[] keyBytes = Decoders.BASE64.decode(SECRET_KEY);
-        return Keys.hmacShaKeyFor(keyBytes);
+//        byte[] keyBytes = Decoders.BASE64.decode(SECRET_KEY);
+//        return Keys.hmacShaKeyFor(keyBytes);
+       return Keys.hmacShaKeyFor(SECRET_KEY.getBytes(StandardCharsets.UTF_8));
     }
 }

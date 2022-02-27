@@ -58,10 +58,10 @@ export default {
         }
     },
     beforeMount() {
-        var data = { programId : this.$route.params.programid,
-                     isOpen : false }
-
-        axios.get('/missions/list', data)
+        axios.get('/missions/list', { params:{
+            programId : this.$route.params.programId,
+            isOpen: false
+        }})
         .then(res => {
             res.data.missions.forEach(mission => this.missions.push(mission));
         }).catch(err => {

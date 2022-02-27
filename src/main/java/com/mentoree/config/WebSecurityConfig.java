@@ -3,6 +3,7 @@ package com.mentoree.config;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mentoree.config.security.CustomAuthenticationEntryPoint;
 import com.mentoree.config.security.util.JwtUtils;
+import com.mentoree.config.security.util.SecurityConstant;
 import com.mentoree.global.filters.ReadableRequestWrapperFilter;
 import com.mentoree.participants.repository.ParticipantRepository;
 import com.mentoree.global.repository.TokenRepository;
@@ -24,6 +25,9 @@ import org.springframework.security.web.authentication.logout.LogoutFilter;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
+import static com.mentoree.config.security.util.SecurityConstant.ACCESS_TOKEN_COOKIE;
+import static com.mentoree.config.security.util.SecurityConstant.UUID_COOKIE;
+
 @EnableWebSecurity
 @RequiredArgsConstructor
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
@@ -32,11 +36,12 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     private final JwtUtils jwtUtils;
     private final ObjectMapper objectMapper;
     private static final String[] NO_AUTH_PATH = {
+            "/login",
+            "/api/logout/**",
             "/api/login/**",
             "/api/reissue",
             "/api/members/join",
             "/api/members/join/**",
-            "/api/programs/**",
             "/swagger-ui.html",
             "/swagger-ui.html/**",
             "/swagger-resources/**",
@@ -80,8 +85,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
         http
                 .logout()
-                .logoutUrl("/logout")
-                .logoutSuccessUrl("/login")
+                .logoutUrl("/api/logout")
+                .logoutSuccessUrl("/api/logout/success")
                 .invalidateHttpSession(true)
                 .deleteCookies("JSESSIONID");
 

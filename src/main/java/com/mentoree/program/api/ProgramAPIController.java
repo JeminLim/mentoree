@@ -56,8 +56,7 @@ public class ProgramAPIController {
         if(bindingResult.hasErrors()) {
             throw new BindingFailureException(bindingResult, "잘못된 프로그램 생성 요청입니다.");
         }
-
-        String email = ((UserPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getEmail();
+        String email = ((UserPrincipal)SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getEmail();
         Member findMember = memberRepository.findByEmail(email).orElseThrow(NoSuchElementException::new);
 
         createForm.setProgramRole(createForm.getMentor() ? ProgramRole.MENTOR.getKey() : ProgramRole.MENTEE.getKey());

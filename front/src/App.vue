@@ -22,7 +22,7 @@ export default {
   },
   computed: {
     currentPage() {
-      return (this.$route.path == '/login') ? true : false;
+      return (this.$route.path == '/login' || this.$route.path == '/register') ? true : false;
     }
   }
 }

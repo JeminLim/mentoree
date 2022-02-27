@@ -96,7 +96,7 @@ export default {
             axios.post('/programs/new', data)
             .then(res => {
                 alert("프로그램이 생성되었습니다.");
-                this.$store.dispatch('addProgram', res.data).user;
+                this.$store.dispatch('user/addProgram', res.data);
                 this.$router.push('/');
             })
             .catch(err => {

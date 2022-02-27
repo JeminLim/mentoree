@@ -144,16 +144,18 @@ router.beforeEach((to, from, next) => {
     if(to.matched.some(function(routeInfo) {
       return routeInfo.meta.authRequired;
     })) {
-      var token = store.getters['token/GET_TOKEN'];
-      if(!token.accessToken && !token.refreshToken) {
+      var loginEmail = store.getters['user/GET_LOGIN_USER'];
+      if(loginEmail == '') {
         next('/login');
       } else {
-        if(from.path != to.path)
-          next();
-        else
-          VueRouter.go(to);
+        next();
+        // if(from.path != to.path)
+        //   next();
+        // else
+        //   VueRouter.go(to);
       }
-    } else {
+    } 
+    else {
       next();
     }
 

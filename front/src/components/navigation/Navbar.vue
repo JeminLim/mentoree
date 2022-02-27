@@ -35,14 +35,20 @@ export default {
     },
     methods: {
         logout() {
-            this.$store.dispatch('logout').user;
+            this.$store.dispatch['user/logout'];
             axios.post('/logout');
+            this.$router.push('/login')
         },
         goToProfile() {
             this.$router.push('/profile/' + this.$store.state.user.email);
         },
         goToHome() {
-            this.$router.push('/');
+            var url = this.$route.path;
+            if(url === '/') {
+                this.$router.go();
+            } else {
+                this.$router.push('/');
+            }
         }
     }
 }

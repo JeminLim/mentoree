@@ -20,6 +20,7 @@ public class RefreshToken extends BaseTimeEntity {
 
     private String email;
     private String uuid;
+    @Column(length = 1000)
     private String accessToken;
 
     @Builder

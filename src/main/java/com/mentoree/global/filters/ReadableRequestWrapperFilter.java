@@ -11,6 +11,7 @@ import java.io.IOException;
 public class ReadableRequestWrapperFilter implements Filter {
 
     private static final String[] excludePath = {"/api/members/join",
+                                                 "/api/login/**",
                                                 "/swagger-ui",
                                                 "/swagger-ui.html/**",
                                                 "/swagger-resources/**",

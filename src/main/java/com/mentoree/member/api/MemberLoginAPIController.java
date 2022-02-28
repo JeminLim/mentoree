@@ -6,6 +6,7 @@ import com.mentoree.config.security.util.EncryptUtils;
 import com.mentoree.config.security.util.JwtUtils;
 import com.mentoree.config.security.util.SecurityConstant;
 import com.mentoree.global.domain.RefreshToken;
+import com.mentoree.global.domain.UserRole;
 import com.mentoree.global.exception.InvalidTokenException;
 import com.mentoree.global.exception.NoAuthorityException;
 import com.mentoree.member.api.dto.MemberDTO;
@@ -53,6 +54,8 @@ public class MemberLoginAPIController {
     @ApiOperation(value = "회원 로그인 성공 후 로직", hidden = true)
     @PostMapping("/login/success")
     public ResponseEntity loginSuccess(HttpServletRequest request, HttpServletResponse response) {
+        String email = ((UserPrincipal)SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getEmail();
+
         // UUID + IP -> IUWT 발급 + refreshToken 저장
         String encryptedUUID = encryptUtils.encrypt(UUID.randomUUID().toString());
         String encryptedIP = encryptUtils.encrypt(request.getRemoteAddr());
@@ -63,10 +66,15 @@ public class MemberLoginAPIController {
         setCookie(response, UUID_COOKIE, encryptedUUID, REFRESH_VALID_TIME);
 
         //refresh token 저장
-        String email = ((UserPrincipal)SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getEmail();
-        RefreshToken refreshToken = RefreshToken.builder().uuid(encryptedUUID).accessToken(accessToken).email(email).build();
-        tokenRepository.save(refreshToken);
-
+        Optional<RefreshToken> refreshToken = tokenRepository.findByEmail(email);
+        if(refreshToken.isEmpty()) {
+            RefreshToken generateRefreshToken = RefreshToken.builder().uuid(encryptedUUID).accessToken(accessToken).email(email).role(UserRole.USER).build();
+            tokenRepository.save(generateRefreshToken);
+        } else {
+            RefreshToken token = refreshToken.get();
+            token.updateRefreshToken(encryptedUUID, accessToken);
+            tokenRepository.save(token);
+        }
         MemberInfo memberInfo = memberRepository.findMemberInfoByEmail(email).orElseThrow(NoSuchElementException::new);
         List<ParticipatedProgramDTO> participateProgram = participantRepository.findParticipateProgram(email);
         memberInfo.setParticipatedPrograms(participateProgram);
@@ -98,14 +106,12 @@ public class MemberLoginAPIController {
     @ApiOperation(value = "액세스 토큰 재발급", notes = "토큰 검증 후, 재발급 액세스 토큰 반환")
     @PostMapping("/reissue")
     public ResponseEntity reissueToken(HttpServletRequest request, HttpServletResponse response) {
-
-        //== DB 토큰과 검증 ==//
-        String email = ((UserPrincipal)SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getEmail();
-        RefreshToken refreshToken = tokenRepository.findByEmail(email).orElseThrow(NoSuchElementException::new);
-
         Map<String, String> cookies = Arrays.stream(request.getCookies()).collect(Collectors.toMap(Cookie::getName, Cookie::getValue));
         String accessToken = cookies.get(ACCESS_TOKEN_COOKIE);
+        String email = jwtUtils.getSubject(accessToken);
 
+        //== DB 토큰과 검증 ==//
+        RefreshToken refreshToken = tokenRepository.findByEmail(email).orElseThrow(NoSuchElementException::new);
         String uuidCookie = encryptUtils.decrypt(cookies.get(UUID_COOKIE));
         String dbUUID = encryptUtils.decrypt(refreshToken.getUuid());
 
@@ -116,7 +122,7 @@ public class MemberLoginAPIController {
         //토큰 갱신
         String encryptedUUID = encryptUtils.encrypt(UUID.randomUUID().toString());
         String encryptedIP = encryptUtils.encrypt(request.getRemoteAddr());
-        String newToken = jwtUtils.generateAccessToken(encryptedUUID, encryptedIP);
+        String newToken = jwtUtils.generateAccessToken(encryptedUUID, encryptedIP, email, refreshToken.getRole());
 
         // 토큰 및 UUID 쿠키 저장
         setCookie(response, ACCESS_TOKEN_COOKIE, newToken, REFRESH_VALID_TIME);

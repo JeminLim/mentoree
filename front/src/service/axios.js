@@ -29,7 +29,7 @@ instance.interceptors.response.use(
         }
     }, function(error) {
         const config = error.config;
-        if(error.response.data.code.startWith('U')) {
+        if(error.response.data.code.startsWith('U')) {
             // 권한 없음 -> 이전 페이지로 이동
             if(error.response.data.code == 'U003') {
                 alert("프로그램 참가자가 아닙니다.");
@@ -37,8 +37,9 @@ instance.interceptors.response.use(
             }
             //재발급 요청
             else if(error.response.data.code == 'U004') {
-                axios.post("/api/reissue")
+                axios.post("/reissue")
                 .then(() => {
+                    console.log('success?');
                    axios.request(config);
                 });
             }

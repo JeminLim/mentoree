@@ -4,10 +4,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
+import javax.persistence.*;
 
 @Entity
 @Getter
@@ -23,11 +20,15 @@ public class RefreshToken extends BaseTimeEntity {
     @Column(length = 1000)
     private String accessToken;
 
+    @Enumerated(EnumType.STRING)
+    private UserRole role;
+
     @Builder
-    public RefreshToken(String email, String uuid, String accessToken) {
+    public RefreshToken(String email, String uuid, String accessToken, UserRole role) {
         this.email = email;
         this.uuid = uuid;
         this.accessToken = accessToken;
+        this.role = role;
     }
 
     public void updateRefreshToken(String uuid, String accessToken) {

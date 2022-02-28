@@ -1,6 +1,7 @@
 package com.mentoree.config.security.util;
 
 import com.mentoree.config.security.UserPrincipal;
+import com.mentoree.global.domain.UserRole;
 import com.mentoree.global.exception.InvalidTokenException;
 import com.mentoree.participants.repository.ParticipantRepository;
 import com.mentoree.program.api.dto.ProgramDTO;
@@ -10,6 +11,9 @@ import io.jsonwebtoken.security.Keys;
 import io.jsonwebtoken.security.SignatureException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -24,6 +28,7 @@ import java.nio.charset.StandardCharsets;
 import java.security.Key;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static com.mentoree.config.security.util.SecurityConstant.*;
 import static com.mentoree.config.security.util.SecurityConstant.ACCESS_VALIDATION_TIME;
@@ -52,7 +57,6 @@ public class JwtUtils {
             Claims claims = Jwts.parserBuilder()
                     .setSigningKey(getKey())
                     .build().parseClaimsJws(accessToken).getBody();
-
             // pc -> ip 주소 비교 검증
             String userAgent = request.getHeader("User-Agent").toUpperCase();
             if(!userAgent.contains(IS_MOBILE)) {
@@ -87,7 +91,7 @@ public class JwtUtils {
     public String generateAccessToken(String encryptedUUID, String encryptedIP) {
 
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        String username = ((UserPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getEmail();
+        String username = ((UserPrincipal) auth.getPrincipal()).getEmail();
 
         String authorities = auth.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
@@ -104,9 +108,37 @@ public class JwtUtils {
                 .compact();
     }
 
+    public String generateAccessToken(String encryptedUUID, String encryptedIP, String email, UserRole role) {
+                String authorities = Stream.of(new SimpleGrantedAuthority(role.getKey()))
+                .map(GrantedAuthority::getAuthority)
+                .collect(Collectors.joining(","));
+
+        return Jwts.builder()
+                .setSubject(email)
+                .setIssuedAt(new Date(System.currentTimeMillis()))
+                .setExpiration(new Date(System.currentTimeMillis() + ACCESS_VALIDATION_TIME))
+                .claim("authorities", authorities)
+                .claim("uuid", encryptedUUID)
+                .claim("ip", encryptedIP)
+                .signWith(getKey(), SignatureAlgorithm.HS512)
+                .compact();
+    }
+
+    public String getSubject(String token) {
+        String[] chunks = token.split("\\.");
+        Base64.Decoder decoder = Base64.getUrlDecoder();
+        String payload = new String(decoder.decode(chunks[1]));
+        JSONParser parser = new JSONParser();
+        JSONObject parse = new JSONObject();
+        try {
+            parse = (JSONObject) parser.parse(payload);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return (String)parse.get("sub");
+    }
+
    private Key getKey() {
-//        byte[] keyBytes = Decoders.BASE64.decode(SECRET_KEY);
-//        return Keys.hmacShaKeyFor(keyBytes);
        return Keys.hmacShaKeyFor(SECRET_KEY.getBytes(StandardCharsets.UTF_8));
     }
 }
